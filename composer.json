@@ -1,0 +1,16 @@
+{
+    "name": "slayerbirden/df-code-generation",
+    "description": "Code generation tool for DataFlow server",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oleg Kulik",
+            "email": "olegkulik1985@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "zendframework/zend-code": "^3.2@dev",
+        "symfony/console": "^4.1@dev"
+    }
+}
