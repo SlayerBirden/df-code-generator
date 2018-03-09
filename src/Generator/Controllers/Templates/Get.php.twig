@@ -1,0 +1,76 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ ns }};
+
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
+use Psr\Http\Server\MiddlewareInterface;
+use {{ useStatement }};
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
+use SlayerBirden\DataFlowServer\Notification\DangerMessage;
+use Zend\Diactoros\Response\JsonResponse;
+use Zend\Hydrator\ExtractionInterface;
+
+class Get{{ entityName }}Action implements MiddlewareInterface
+{
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+    /**
+     * @var ExtractionInterface
+     */
+    private $extraction;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger,
+        ExtractionInterface $extraction
+    ) {
+        $this->entityManager = $entityManager;
+        $this->logger = $logger;
+        $this->extraction = $extraction;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $id = $request->getAttribute('id');
+        $success = false;
+        $msg = '';
+        $status = 200;
+
+        try {
+            $entity = $this->entityManager
+                ->getRepository({{ entityName }}::class)
+                ->find($id);
+            if ($entity) {
+                $success = true;
+            } else {
+                $status = 404;
+            }
+        } catch (ORMException $exception) {
+            $this->logger->error((string)$exception);
+            $msg = new DangerMessage('Could not find {{ entityName|lower }}.');
+            $status = 400;
+        }
+
+        return new JsonResponse([
+            'data' => [
+                '{{ entityName|lower }}' => isset($entity) ? $this->extraction->extract($entity): null,
+            ],
+            'success' => $success,
+            'msg' => $msg,
+        ], $status);
+    }
+}

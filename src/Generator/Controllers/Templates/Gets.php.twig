@@ -1,0 +1,109 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ ns }};
+
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
+use Psr\Http\Server\MiddlewareInterface;
+use {{ useStatement }};
+use SlayerBirden\DataFlowServer\Notification\DangerMessage;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
+use Zend\Diactoros\Response\JsonResponse;
+use Zend\Hydrator\ExtractionInterface;
+
+class Get{{ entityName }}Action implements MiddlewareInterface
+{
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+    /**
+     * @var ExtractionInterface
+     */
+    private $extraction;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger,
+        ExtractionInterface $extraction
+    ) {
+        $this->entityManager = $entityManager;
+        $this->logger = $logger;
+        $this->extraction = $extraction;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $data = $request->getQueryParams();
+        $page = isset($data['p']) ? abs($data['p']) : null;
+        $filters = $data['f'] ?? [];
+        $sorting = $data['s'] ?? [];
+        $success = false;
+        $msg = '';
+        $status = 200;
+
+        try {
+            $criteria = $this->buildCriteria($filters, $sorting, $page);
+
+            /** @var Collection $entities */
+            $entities = $this->entityManager
+                ->getRepository({{ entityName }}::class)
+                ->matching($criteria);
+            // before collection load to count all records without pagination
+            $count = $entities->count();
+
+            if ($count > 0) {
+                $arrayEntities = array_map(function ($entities) {
+                    return $this->extraction->extract($entities);
+                }, $entities->toArray());
+                $success = true;
+            } else {
+                $msg = new DangerMessage('Could not find {{ entityName|lower }}s using given conditions.');
+                $status = 404;
+            }
+        } catch (ORMException $exception) {
+            $this->logger->error((string)$exception);
+            $msg = new DangerMessage('Could not fetch {{ entityName|lower }}s.');
+            $status = 400;
+        }
+
+        return new JsonResponse([
+            'data' => [
+                '{{ entityName|lower }}s' => $arrayEntities ?? [],
+                'count' => $count ?? 0,
+            ],
+            'success' => $success,
+            'msg' => $msg,
+        ], $status);
+    }
+
+    private function buildCriteria(array $filters = [], array $sorting = [], ?int $page = null, int $limit = 10): Criteria
+    {
+        $criteria = Criteria::create();
+        if ($page !== null) {
+            $criteria->setFirstResult(($page - 1) * $limit)
+                ->setMaxResults($limit);
+        }
+        foreach ($filters as $key => $value) {
+            $criteria->andWhere(Criteria::expr()->contains($key, $value));
+        }
+        if ($sorting) {
+            $criteria->orderBy($sorting);
+        }
+
+        return $criteria;
+    }
+}

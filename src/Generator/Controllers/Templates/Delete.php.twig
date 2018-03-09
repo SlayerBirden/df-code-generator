@@ -1,0 +1,79 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ ns }};
+
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use {{ useStatement }};
+use SlayerBirden\DataFlowServer\Notification\DangerMessage;
+use SlayerBirden\DataFlowServer\Notification\SuccessMessage;
+use Zend\Diactoros\Response\JsonResponse;
+use Zend\Hydrator\ExtractionInterface;
+
+class Delete{{ entityName }}Action implements MiddlewareInterface
+{
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+    /**
+     * @var ExtractionInterface
+     */
+    private $extraction;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger,
+        ExtractionInterface $extraction
+    ) {
+        $this->entityManager = $entityManager;
+        $this->logger = $logger;
+        $this->extraction = $extraction;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $id = $request->getAttribute('id');
+        $deleted = false;
+        $status = 200;
+
+        try {
+            $entity = $this->entityManager->find({{ entityName }}::class, $id);
+            //todo check owner
+            if ($entity) {
+                $this->entityManager->remove($entity);
+                $this->entityManager->flush();
+                $msg = new SuccessMessage('{{ entityName }} removed.');
+                $deleted = true;
+            } else {
+                $msg = new DangerMessage('Could not find {{ entityName|lower}} to delete.');
+                $status = 404;
+            }
+        } catch (ORMException $exception) {
+            $this->logger->error((string)$exception);
+            $msg = new DangerMessage('There was an error while removing {{ entityName|lower}}.');
+            $status = 400;
+        }
+
+        return new JsonResponse([
+            'msg' => $msg,
+            'success' => $deleted,
+            'data' => [
+                '{{ entityName|lower}}' => !empty($entity) ? $this->extraction->extract($entity) : null
+            ],
+        ], $status);
+    }
+}

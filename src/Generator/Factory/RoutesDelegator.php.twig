@@ -1,0 +1,27 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ ns }};
+
+use Psr\Container\ContainerInterface;
+use Zend\Expressive\Application;
+use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
+
+class RoutesDelegator
+{
+    /**
+     * @param ContainerInterface $container
+     * @param string $serviceName
+     * @param callable $callback
+     * @return Application
+     */
+    public function __invoke(ContainerInterface $container, string $serviceName, callable $callback)
+    {
+        /** @var $app Application */
+        $app = $callback();
+
+{{ routes|raw }}
+
+        return $app;
+    }
+}

@@ -1,0 +1,22 @@
+        $app->get('/{{ entityName|lower }}/{id:\d+}', [
+            {{ controllerNs }}\Get{{ entityName }}Action::class
+        ], 'get_{{ entityName|lower }}');
+
+        $app->get('/{{ entityName|lower }}s', [
+            {{ controllerNs }}\Get{{ entityName }}sAction::class
+        ], 'get_{{ entityName|lower }}s');
+
+        $app->post('/{{ entityName|lower }}', [
+            BodyParamsMiddleware::class,
+            {{ controllerNs }}\Add{{ entityName }}Action::class
+        ], 'add_{{ entityName|lower }}');
+
+        $app->put('/{{ entityName|lower }}/{id:\d+}', [
+            BodyParamsMiddleware::class,
+            {{ controllerNs }}\Update{{ entityName }}Action::class
+        ], 'update_{{ entityName|lower }}');
+
+        $app->delete('/{{ entityName|lower }}/{id:\d+}', [
+            {{ controllerNs }}\Delete{{ entityName }}Action::class
+        ], 'delete_{{ entityName|lower }}');
+#=====

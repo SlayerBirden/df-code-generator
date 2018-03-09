@@ -8,9 +8,20 @@
             "email": "olegkulik1985@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "SlayerBirden\\DFCodeGeneration\\": [
+                "src",
+                "tests/functional"
+            ]
+        }
+    },
     "minimum-stability": "dev",
     "require": {
-        "zendframework/zend-code": "^3.2@dev",
-        "symfony/console": "^4.1@dev"
+        "symfony/console": "^4.1@dev",
+        "twig/twig": "2.x-dev",
+        "doctrine/annotations": "^1.7@dev",
+        "doctrine/orm": "2.7.x-dev",
+        "zendframework/zend-code": "^3.2@dev"
     }
 }
