@@ -12,6 +12,7 @@ use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Get;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Gets;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Update;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Routes;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Add as TestAdd;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -56,6 +57,13 @@ class ApiSuiteCommand extends Command
         $this->generateControllerStack($entityClassName, $uniqueFields, $input, $output);
         $this->generateRoutes($entityClassName, $routesPath, $input, $output);
         $this->generateConfig($entityClassName, $input, $output);
+
+        if ($input->getOption('tests')) {
+            $addBody = (new TestAdd($entityClassName))->generate();
+            if (!$input->getOption('force')) {
+                $output->write($addBody);
+            }
+        }
     }
 
     private function generateConfig(string $entityClassName, InputInterface $input, OutputInterface $output): void

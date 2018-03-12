@@ -119,6 +119,7 @@ class Add{{ entityName }}Action implements MiddlewareInterface
     private function getEntity(array $data): {{ entityName }}
     {
         $entity = new {{ entityName }}();
+        {{ dataRelationship|raw }}
         $this->hydrator->hydrate($data, $entity);
 
         return $entity;

@@ -22,6 +22,7 @@
         "twig/twig": "2.x-dev",
         "doctrine/annotations": "^1.7@dev",
         "doctrine/orm": "2.7.x-dev",
-        "zendframework/zend-code": "^3.2@dev"
+        "zendframework/zend-code": "^3.2@dev",
+        "fzaninotto/faker": "^1.8@dev"
     }
 }
