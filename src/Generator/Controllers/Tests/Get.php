@@ -10,6 +10,11 @@ use Zend\Code\Generator\ParameterGenerator;
 
 class Get extends AbstractTest
 {
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     public function generate(): string
     {
         $className = 'Get' . $this->getBaseName($this->entityClassName) . 'Cest';

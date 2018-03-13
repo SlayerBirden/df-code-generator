@@ -10,6 +10,11 @@ use Zend\Code\Generator\ParameterGenerator;
 
 class Add extends AbstractTest
 {
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     public function generate(): string
     {
         $className = 'Add' . $this->getBaseName($this->entityClassName) . 'Cest';
@@ -45,6 +50,11 @@ class Add extends AbstractTest
             ->generate();
     }
 
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function getSuccessCase(): string
     {
         $body = <<<'BODY'
@@ -64,6 +74,11 @@ BODY;
         return sprintf($body, $this->shortName, var_export($this->getPostParams(), true));
     }
 
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function getValidationCase(): string
     {
         $params = $this->getPostParams();
@@ -103,7 +118,7 @@ BODY;
 
         $params = $this->getHaveInRepoParams($this->entityClassName);
         foreach ($params as $key => $param) {
-            if (is_object($param)) {
+            if (is_object($param) && method_exists($param, 'getId')) {
                 $params[$key] = $param->getId();
             }
         }

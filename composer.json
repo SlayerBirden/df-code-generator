@@ -27,6 +27,7 @@
         "fzaninotto/faker": "^1.8@dev"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.1@dev"
+        "phpunit/phpunit": "^7.1@dev",
+        "mikey179/vfsStream": "^2.0@dev"
     }
 }

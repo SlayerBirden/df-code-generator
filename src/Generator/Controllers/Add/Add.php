@@ -7,6 +7,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToOne;
+use Zend\Code\Reflection\ClassReflection;
 
 class Add extends AbstractUniqueFieldsAction
 {
@@ -18,11 +19,16 @@ class Add extends AbstractUniqueFieldsAction
         OneToOne::class,
     ];
 
+    /**
+     * @return array
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     protected function getParams(): array
     {
         $params = parent::getParams();
 
-        $reflectionClassName = new \ReflectionClass($this->entityClassName);
+        $reflectionClassName = new ClassReflection($this->entityClassName);
         foreach ($reflectionClassName->getProperties() as $property) {
             foreach ($this->relations as $type) {
                 $annotation = (new AnnotationReader())

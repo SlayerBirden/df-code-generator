@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Add;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Zend\Code\Reflection\ClassReflection;
 
 abstract class AbstractUniqueFieldsAction extends AbstractAction
 {
@@ -16,15 +17,24 @@ abstract class AbstractUniqueFieldsAction extends AbstractAction
      */
     protected $uniqueFields = [];
 
+    /**
+     * @param string $entityClassName
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     public function __construct(string $entityClassName)
     {
         parent::__construct($entityClassName);
         $this->prepareUnique();
     }
 
+    /**
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function prepareUnique(): void
     {
-        $reflectionClassName = new \ReflectionClass($this->entityClassName);
+        $reflectionClassName = new ClassReflection($this->entityClassName);
         foreach ($reflectionClassName->getProperties() as $property) {
             /** @var \Doctrine\ORM\Mapping\Column $annotation */
             $annotation = (new AnnotationReader())
@@ -36,6 +46,10 @@ abstract class AbstractUniqueFieldsAction extends AbstractAction
         }
     }
 
+    /**
+     * @return array
+     * @throws \ReflectionException
+     */
     protected function getParams(): array
     {
         $params = parent::getParams();

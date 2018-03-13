@@ -10,6 +10,11 @@ use Zend\Code\Generator\ParameterGenerator;
 
 class Update extends AbstractTest
 {
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     public function generate(): string
     {
         $className = 'Update' . $this->getBaseName($this->entityClassName) . 'Cest';
@@ -57,6 +62,11 @@ class Update extends AbstractTest
             ->generate();
     }
 
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function getSuccessCase(): string
     {
         $body = <<<'BODY'
@@ -77,6 +87,11 @@ BODY;
             var_export($this->getPostParams(), true));
     }
 
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function getNonExistingCase(): string
     {
         $body = <<<'BODY'
@@ -95,6 +110,11 @@ BODY;
         return sprintf($body, $this->shortName, var_export($this->getPostParams(), true));
     }
 
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function getUpdateSetIdCase(): string
     {
         $body = <<<'BODY'
@@ -119,6 +139,11 @@ BODY;
         return sprintf($body, $this->shortName, var_export($paramsWithId, true), var_export($expected, true));
     }
 
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function getInvalidInputCase(): string
     {
         $params = $this->getPostParams();
@@ -161,7 +186,7 @@ BODY;
             if ($key === 'id') {
                 unset($params[$key]);
             }
-            if (is_object($param)) {
+            if (is_object($param) && method_exists($param, 'getId')) {
                 $params[$key] = $param->getId();
             }
         }

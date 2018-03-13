@@ -5,6 +5,7 @@ namespace SlayerBirden\DFCodeGeneration\Command;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Config;
+use SlayerBirden\DFCodeGeneration\Generator\Config\StandardProvider;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Add;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Delete;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Get;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend\Code\Reflection\ClassReflection;
 
 class ApiSuiteCommand extends Command
 {
@@ -62,6 +64,11 @@ class ApiSuiteCommand extends Command
         AnnotationRegistry::registerLoader('class_exists');
     }
 
+    /**
+     * {@inheritdoc}
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (!class_exists($this->entityClassName)) {
@@ -76,6 +83,10 @@ class ApiSuiteCommand extends Command
         }
     }
 
+    /**
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function generateTests(): void
     {
         $addBody = (new TestAdd($this->entityClassName))->generate();
@@ -94,16 +105,22 @@ class ApiSuiteCommand extends Command
 
     private function generateConfig(): void
     {
-        $configBody = (new Config($this->entityClassName))->generate();
+        $configBody = (new Config(new StandardProvider($this->entityClassName)))->generate();
 
         if (!$this->force) {
             $this->output->write($configBody);
         }
     }
 
+    /**
+     * @throws \ReflectionException
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
+     */
     private function generateRoutes(): void
     {
-        $reflectionClassName = new \ReflectionClass($this->entityClassName);
+        $reflectionClassName = new ClassReflection($this->entityClassName);
         $routesPath = dirname($reflectionClassName->getFileName(), 2) . 'Factory/RoutesDelegator.php';
 
         $routesBody = (new Routes($routesPath, $this->entityClassName))->generate();
@@ -113,6 +130,13 @@ class ApiSuiteCommand extends Command
         }
     }
 
+    /**
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
+     */
     private function generateControllerStack(): void
     {
         $addBody = (new Add($this->entityClassName))->generate();

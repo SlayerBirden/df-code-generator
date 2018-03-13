@@ -30,15 +30,25 @@ class Routes
         $this->entityClassName = $entityClassName;
     }
 
+    /**
+     * @return string
+     * @throws \ReflectionException
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
+     */
     public function generate(): string
     {
-        if (file_exists($this->filePath)) {
-            return $this->updateExistingFile();
-        } else {
-            return $this->generateNewFile();
-        }
+        return file_exists($this->filePath) ? $this->updateExistingFile() : $this->generateNewFile();
     }
 
+    /**
+     * @return string
+     * @throws \ReflectionException
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
+     */
     private function updateExistingFile(): string
     {
         $loader = new FilesystemLoader(__DIR__);
@@ -56,6 +66,13 @@ class Routes
         return $this->generateNewFile();
     }
 
+    /**
+     * @return string
+     * @throws \ReflectionException
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
+     */
     private function generateNewFile(): string
     {
         $loader = new FilesystemLoader(__DIR__);
@@ -68,6 +85,10 @@ class Routes
         return $twig->load('RoutesDelegator.php.twig')->render($params);
     }
 
+    /**
+     * @return array
+     * @throws \ReflectionException
+     */
     private function getParams(): array
     {
         return [
