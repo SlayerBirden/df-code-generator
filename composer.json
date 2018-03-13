@@ -12,7 +12,8 @@
         "psr-4": {
             "SlayerBirden\\DFCodeGeneration\\": [
                 "src",
-                "tests/functional"
+                "tests/functional",
+                "tests/unit"
             ]
         }
     },
@@ -24,5 +25,8 @@
         "doctrine/orm": "2.7.x-dev",
         "zendframework/zend-code": "^3.2@dev",
         "fzaninotto/faker": "^1.8@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.1@dev"
     }
 }
