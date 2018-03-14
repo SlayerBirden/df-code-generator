@@ -17,13 +17,13 @@ use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Delete as TestDele
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Get as TestGet;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Gets as TestGets;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Update as TestUpdate;
+use SlayerBirden\DFCodeGeneration\Generator\Factory\SimpleProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Zend\Code\Reflection\ClassReflection;
 
 class ApiSuiteCommand extends Command
 {
@@ -113,17 +113,13 @@ class ApiSuiteCommand extends Command
     }
 
     /**
-     * @throws \ReflectionException
      * @throws \Twig_Error_Loader
      * @throws \Twig_Error_Runtime
      * @throws \Twig_Error_Syntax
      */
     private function generateRoutes(): void
     {
-        $reflectionClassName = new ClassReflection($this->entityClassName);
-        $routesPath = dirname($reflectionClassName->getFileName(), 2) . 'Factory/RoutesDelegator.php';
-
-        $routesBody = (new Routes($routesPath, $this->entityClassName))->generate();
+        $routesBody = (new Routes(new SimpleProvider($this->entityClassName)))->generate();
 
         if (!$this->force) {
             $this->output->write($routesBody);

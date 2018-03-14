@@ -41,18 +41,20 @@ class ConfigTest extends TestCase
 
     public function testNewConfig()
     {
-        $value = (new Config($this->provider->reveal()))->generate();
+        $configGenerator = new Config($this->provider->reveal());
+        $value = $configGenerator->generate();
 
         $root = vfsStream::setup();
         file_put_contents($root->url() . '/dummyProvider.php', $value);
         try {
             include $root->url() . '/dummyProvider.php';
         } catch (\ParseError $exception) {
-            echo 'File' , PHP_EOL, $this->getPrintableFile($value), PHP_EOL;
+            echo 'File', PHP_EOL, $this->getPrintableFile($value), PHP_EOL;
             throw $exception;
         }
 
-        $config = new \A\B\ConfigProvider();
+        $class = $configGenerator->getClassName();
+        $config = new $class();
 
         $actual = call_user_func($config);
 
@@ -174,18 +176,20 @@ class ConfigTest extends TestCase
         ]);
         $this->provider->getConfigNameSpace()->willReturn('A\C');
 
-        $value = (new Config($this->provider->reveal()))->generate();
+        $configGenerator = new Config($this->provider->reveal());
+        $value = $configGenerator->generate();
 
         $root = vfsStream::setup();
         file_put_contents($root->url() . '/dummyProvider.php', $value);
         try {
             include $root->url() . '/dummyProvider.php';
         } catch (\ParseError $exception) {
-            echo 'File' , PHP_EOL, $this->getPrintableFile($value), PHP_EOL;
+            echo 'File', PHP_EOL, $this->getPrintableFile($value), PHP_EOL;
             throw $exception;
         }
 
-        $config = new \A\C\ConfigProvider();
+        $class = $configGenerator->getClassName();
+        $config = new $class();
 
         $actual = call_user_func($config);
 
@@ -283,5 +287,10 @@ class ConfigTest extends TestCase
         ];
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetClassName()
+    {
+        $this->assertSame('A\\B\\ConfigProvider', (new Config($this->provider->reveal()))->getClassName());
     }
 }

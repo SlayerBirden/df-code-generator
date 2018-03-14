@@ -3,24 +3,45 @@ declare(strict_types=1);
 
 namespace {{ ns }};
 
-use Psr\Container\ContainerInterface;
+use Interop\Container\ContainerInterface;
+use {{ controllerNs }};
 use Zend\Expressive\Application;
 use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
+use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
 
-class RoutesDelegator
+class {{ entityName }}RoutesDelegator
 {
-    /**
-     * @param ContainerInterface $container
-     * @param string $serviceName
-     * @param callable $callback
-     * @return Application
-     */
-    public function __invoke(ContainerInterface $container, string $serviceName, callable $callback)
-    {
-        /** @var $app Application */
+    public function __invoke(
+        ContainerInterface $container,
+        $name,
+        callable $callback,
+        array $options = null
+    ): Application {
+        /** @var Application $app */
         $app = $callback();
 
-{{ routes|raw }}
+        $app->get('/{{ entityName|lower }}/{id:\d+}', [
+            Controller\Get{{ entityName }}Action::class
+        ], 'get_{{ entityName|lower }}');
+
+        $app->get('/{{ entityName|lower }}s', [
+            Controller\Get{{ entityName }}sAction::class
+        ], 'get_{{ entityName|lower }}s');
+
+        $app->post('/{{ entityName|lower }}', [
+            BodyParamsMiddleware::class,
+            Controller\Add{{ entityName }}Action::class
+        ], 'add_{{ entityName|lower }}');
+
+        $app->put('/{{ entityName|lower }}/{id:\d+}', [
+            BodyParamsMiddleware::class,
+            Controller\Update{{ entityName }}Action::class
+        ], 'update_{{ entityName|lower }}');
+
+        $app->delete('/{{ entityName|lower }}/{id:\d+}', [
+            Controller\Delete{{ entityName }}Action::class
+        ], 'delete_{{ entityName|lower }}');
+
         return $app;
     }
 }

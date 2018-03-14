@@ -25,9 +25,14 @@ class StandardProvider implements DataProviderInterface
         $this->entityClassName = $entityClassName;
     }
 
+    /**
+     * @return string
+     * @throws \ReflectionException
+     */
     public function getRouteFactoryName(): string
     {
-        return $this->getFactoryNs($this->entityClassName) . '\\RoutesDelegator';
+        $baseName = $this->getBaseName($this->entityClassName);
+        return $this->getFactoryNs($this->entityClassName) . "\\{$baseName}RoutesDelegator";
     }
 
     /**

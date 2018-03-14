@@ -91,4 +91,9 @@ class Config implements GeneratorInterface
             ],
         ];
     }
+
+    public function getClassName(): string
+    {
+        return $this->provider->getConfigNameSpace() . '\\ConfigProvider';
+    }
 }
