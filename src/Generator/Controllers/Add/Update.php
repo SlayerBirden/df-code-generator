@@ -6,4 +6,9 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Add;
 class Update extends AbstractUniqueFieldsAction
 {
     protected $template = 'Update.php.twig';
+
+    public function getClassName(): string
+    {
+        return $this->getNs($this->entityClassName) . '\\Update' . $this->getBaseName($this->entityClassName) . 'Action';
+    }
 }

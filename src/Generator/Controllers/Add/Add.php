@@ -41,4 +41,9 @@ class Add extends AbstractUniqueFieldsAction
 
         return $params;
     }
+
+    public function getClassName(): string
+    {
+        return $this->getNs($this->entityClassName) . '\\Add' . $this->getBaseName($this->entityClassName) . 'Action';
+    }
 }
