@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests;
+namespace SlayerBirden\DFCodeGeneration\Generator\Tests;
 
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;

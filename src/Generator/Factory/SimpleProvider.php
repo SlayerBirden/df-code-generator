@@ -23,22 +23,25 @@ class SimpleProvider implements DataProviderInterface
         $this->entityClassName = $entityClassName;
     }
 
-    public function getRoutesDelegatorNameSpace(): string
+    /**
+     * @return array
+     * @throws \ReflectionException
+     */
+    public function provide(): array
     {
-        return $this->getNs($this->entityClassName);
-    }
-
-    public function getControllerNameSpace(): string
-    {
-        return $this->getControllerNs($this->entityClassName);
+        return [
+            'ns' => $this->getNs($this->entityClassName),
+            'controllerNs' => $this->getControllerNs($this->entityClassName),
+            'entityName' => $this->getBaseName($this->entityClassName),
+        ];
     }
 
     /**
      * @return string
      * @throws \ReflectionException
      */
-    public function getShortName(): string
+    public function getClassName(): string
     {
-        return $this->getBaseName($this->entityClassName);
+        return $this->getNs($this->entityClassName) . '\\' . $this->getBaseName($this->entityClassName) . 'RoutesDelegator';
     }
 }

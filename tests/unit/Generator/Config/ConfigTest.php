@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace SlayerBirden\DFCodeGeneration\Generator\Config;
 
 use Doctrine\ORM\EntityManagerInterface;
-use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use SlayerBirden\DFCodeGeneration\CodeLoader;
 use SlayerBirden\DFCodeGeneration\PrintFileTrait;
 
-class ConfigTest extends TestCase
+class GetTest extends TestCase
 {
     use PrintFileTrait;
     /**
@@ -44,19 +44,15 @@ class ConfigTest extends TestCase
         $configGenerator = new Config($this->provider->reveal());
         $value = $configGenerator->generate();
 
-        $root = vfsStream::setup();
-        file_put_contents($root->url() . '/dummyProvider.php', $value);
         try {
-            include $root->url() . '/dummyProvider.php';
+            CodeLoader::loadCode($value, 'dummyProvider.php');
+            $class = $configGenerator->getClassName();
+            $config = new $class();
+            $actual = call_user_func($config);
         } catch (\ParseError $exception) {
             echo 'File', PHP_EOL, $this->getPrintableFile($value), PHP_EOL;
             throw $exception;
         }
-
-        $class = $configGenerator->getClassName();
-        $config = new $class();
-
-        $actual = call_user_func($config);
 
         $expected = [
             '\\Zend\\ServiceManager\\AbstractFactory\\ConfigAbstractFactory' => [
@@ -179,19 +175,15 @@ class ConfigTest extends TestCase
         $configGenerator = new Config($this->provider->reveal());
         $value = $configGenerator->generate();
 
-        $root = vfsStream::setup();
-        file_put_contents($root->url() . '/dummyProvider.php', $value);
         try {
-            include $root->url() . '/dummyProvider.php';
+            CodeLoader::loadCode($value, 'dummyProvider.php');
+            $class = $configGenerator->getClassName();
+            $config = new $class();
+            $actual = call_user_func($config);
         } catch (\ParseError $exception) {
             echo 'File', PHP_EOL, $this->getPrintableFile($value), PHP_EOL;
             throw $exception;
         }
-
-        $class = $configGenerator->getClassName();
-        $config = new $class();
-
-        $actual = call_user_func($config);
 
         $expected = [
             '\\Zend\\ServiceManager\\AbstractFactory\\ConfigAbstractFactory' => [

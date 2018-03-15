@@ -1,31 +1,29 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Add;
+namespace SlayerBirden\DFCodeGeneration\Generator\Controllers;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Zend\Code\Reflection\ClassReflection;
 
-abstract class AbstractUniqueFieldsAction extends AbstractAction
+class UniqueProviderDecorator implements DataProviderDecoratorInterface
 {
     /**
      * @var bool
      */
-    protected $hasUnique = false;
+    private $hasUnique = false;
     /**
      * @var string[]
      */
-    protected $uniqueFields = [];
-
+    private $uniqueFields = [];
     /**
-     * @param string $entityClassName
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
+     * @var string
      */
+    private $entityClassName;
+
     public function __construct(string $entityClassName)
     {
-        parent::__construct($entityClassName);
-        $this->prepareUnique();
+        $this->entityClassName = $entityClassName;
     }
 
     /**
@@ -47,12 +45,14 @@ abstract class AbstractUniqueFieldsAction extends AbstractAction
     }
 
     /**
+     * @param array $data
      * @return array
+     * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \ReflectionException
      */
-    protected function getParams(): array
+    public function decorate(array $data): array
     {
-        $params = parent::getParams();
+        $this->prepareUnique();
 
         $message = '';
         if ($this->hasUnique) {
@@ -63,9 +63,9 @@ abstract class AbstractUniqueFieldsAction extends AbstractAction
             );
         }
 
-        $params['hasUnique'] = $this->hasUnique;
-        $params['uniqueIdxMessage'] = $message;
+        $data['hasUnique'] = $this->hasUnique;
+        $data['uniqueIdxMessage'] = $message;
 
-        return $params;
+        return $data;
     }
 }

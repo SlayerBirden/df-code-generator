@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Add;
+namespace SlayerBirden\DFCodeGeneration\Generator\Controllers;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\ManyToMany;
@@ -9,41 +9,47 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToOne;
 use Zend\Code\Reflection\ClassReflection;
 
-class Add extends AbstractUniqueFieldsAction
+class RelationsProviderDecorator implements DataProviderDecoratorInterface
 {
-    protected $template = 'Add.php.twig';
-
     private $relations = [
         ManyToOne::class,
         ManyToMany::class,
         OneToOne::class,
     ];
-
+    private $hasRelations = false;
     /**
-     * @return array
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
+     * @var string
      */
-    protected function getParams(): array
-    {
-        $params = parent::getParams();
+    private $entityClassName;
 
+    public function __construct(string $entityClassName)
+    {
+        $this->entityClassName = $entityClassName;
+    }
+
+    private function prepareRelations(): void
+    {
         $reflectionClassName = new ClassReflection($this->entityClassName);
         foreach ($reflectionClassName->getProperties() as $property) {
             foreach ($this->relations as $type) {
                 $annotation = (new AnnotationReader())
                     ->getPropertyAnnotation($property, $type);
                 if ($annotation) {
-                    $params['dataRelationship'] = '//TODO process data relationship';
+                    $this->hasRelations = true;
+                    break;
                 }
             }
         }
-
-        return $params;
     }
 
-    public function getClassName(): string
+    public function decorate(array $data): array
     {
-        return $this->getNs($this->entityClassName) . '\\Add' . $this->getBaseName($this->entityClassName) . 'Action';
+        $this->prepareRelations();
+
+        if ($this->hasRelations) {
+            $data['dataRelationship'] = '//TODO process data relationship';
+        }
+
+        return $data;
     }
 }

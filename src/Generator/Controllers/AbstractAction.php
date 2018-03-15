@@ -1,18 +1,22 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Generator\Factory;
+namespace SlayerBirden\DFCodeGeneration\Generator\Controllers;
 
 use SlayerBirden\DFCodeGeneration\Generator\GeneratorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-class Routes implements GeneratorInterface
+abstract class AbstractAction implements GeneratorInterface
 {
+    /**
+     * @var string
+     */
+    protected $template = '';
     /**
      * @var DataProviderInterface
      */
-    private $provider;
+    protected $provider;
 
     public function __construct(DataProviderInterface $provider)
     {
@@ -27,14 +31,9 @@ class Routes implements GeneratorInterface
      */
     public function generate(): string
     {
-        $loader = new FilesystemLoader(__DIR__);
+        $loader = new FilesystemLoader(__DIR__ . '/Templates');
         $twig = new Environment($loader);
 
-        return $twig->load('RoutesDelegator.php.twig')->render($this->provider->provide());
-    }
-
-    public function getClassName(): string
-    {
-        return $this->provider->getClassName();
+        return $twig->load($this->template)->render($this->provider->provide());
     }
 }

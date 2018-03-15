@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace SlayerBirden\DFCodeGeneration\Generator\Factory;
 
 use Interop\Container\ContainerInterface;
-use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use SlayerBirden\DFCodeGeneration\CodeLoader;
 use SlayerBirden\DFCodeGeneration\PrintFileTrait;
 use Zend\Expressive\Application;
 use Zend\Expressive\Router\RouterInterface;
@@ -28,9 +28,12 @@ class RoutesTest extends TestCase
     protected function setUp()
     {
         $this->provider = $this->prophesize(DataProviderInterface::class);
-        $this->provider->getRoutesDelegatorNameSpace()->willReturn('Dummy\\Factory');
-        $this->provider->getControllerNameSpace()->willReturn('Dummy\\Controller');
-        $this->provider->getShortName()->willReturn('Dummy');
+        $this->provider->provide()->willReturn([
+            'ns' => 'Dummy\\Factory',
+            'controllerNs' => 'Dummy\\Controller',
+            'entityName' => 'Dummy',
+        ]);
+        $this->provider->getClassName()->willReturn('Dummy\\Factory\\DummyRoutesDelegator');
 
         $this->router = $this->prophesize(RouterInterface::class);
 
@@ -45,27 +48,24 @@ class RoutesTest extends TestCase
         $body = $routesGenerator->generate();
         $this->loadDummyControllers();
 
-        $root = vfsStream::setup();
-        file_put_contents($root->url() . '/dummyRoutesDelegator.php', $body);
         try {
-            include $root->url() . '/dummyRoutesDelegator.php';
+            CodeLoader::loadCode($body, 'dummyRoutesDelegator.php');
+            $class = $routesGenerator->getClassName();
+            /** @var DelegatorFactoryInterface $delegator */
+            $delegator = new $class();
+
+            $container = $this->prophesize(ContainerInterface::class);
+
+            /** @var Application $app */
+            $app = $delegator($container->reveal(), 'dummy', function () {
+                return $this->app;
+            });
+
+            $routes = $app->getRoutes();
         } catch (\ParseError $exception) {
             echo 'File', PHP_EOL, $this->getPrintableFile($body), PHP_EOL;
             throw $exception;
         }
-
-        $class = $routesGenerator->getClassName();
-        /** @var DelegatorFactoryInterface $delegator */
-        $delegator = new $class();
-
-        $container = $this->prophesize(ContainerInterface::class);
-
-        /** @var Application $app */
-        $app = $delegator($container->reveal(), 'dummy', function () {
-            return $this->app;
-        });
-
-        $routes = $app->getRoutes();
 
         $this->assertCount(5, $routes);
     }
@@ -96,11 +96,9 @@ CONTROLLER;
             'DeleteDummyAction',
             'UpdateDummyAction'
         ];
-        $root = vfsStream::setup();
         foreach ($actions as $action) {
             $body = sprintf($template, $action);
-            file_put_contents($root->url() . "/$action.php", $body);
-            include $root->url() . "/$action.php";
+            CodeLoader::loadCode($body, "$action.php");
         }
     }
 

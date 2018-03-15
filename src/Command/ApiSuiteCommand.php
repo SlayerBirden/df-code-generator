@@ -6,17 +6,20 @@ namespace SlayerBirden\DFCodeGeneration\Command;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Config;
 use SlayerBirden\DFCodeGeneration\Generator\Config\StandardProvider;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Add;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Delete;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Get;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Gets;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add\Update;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\DecoratedProvider;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Delete;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Get;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Gets;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\RelationsProviderDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\UniqueProviderDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Update;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Routes;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Add as TestAdd;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Delete as TestDelete;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Get as TestGet;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Gets as TestGets;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Tests\Update as TestUpdate;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Add as TestAdd;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Delete as TestDelete;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Get as TestGet;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Gets as TestGets;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Update as TestUpdate;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\SimpleProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -24,6 +27,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\SimpleProvider as ControllerSimpleProvider;
 
 class ApiSuiteCommand extends Command
 {
@@ -127,19 +131,29 @@ class ApiSuiteCommand extends Command
     }
 
     /**
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
      * @throws \Twig_Error_Loader
      * @throws \Twig_Error_Runtime
      * @throws \Twig_Error_Syntax
      */
     private function generateControllerStack(): void
     {
-        $addBody = (new Add($this->entityClassName))->generate();
-        $deleteBody = (new Delete($this->entityClassName))->generate();
-        $getBody = (new Get($this->entityClassName))->generate();
-        $getsBody = (new Gets($this->entityClassName))->generate();
-        $updateBody = (new Update($this->entityClassName))->generate();
+        $addBody = (new Add(
+            new DecoratedProvider(
+                $this->entityClassName,
+                new UniqueProviderDecorator($this->entityClassName),
+                new RelationsProviderDecorator($this->entityClassName)
+            )
+        ))->generate();
+        $deleteBody = (new Delete(new ControllerSimpleProvider($this->entityClassName)))->generate();
+        $getBody = (new Get(new ControllerSimpleProvider($this->entityClassName)))->generate();
+        $getsBody = (new Gets(new ControllerSimpleProvider($this->entityClassName)))->generate();
+        $updateBody = (new Update(
+            new DecoratedProvider(
+                $this->entityClassName,
+                new UniqueProviderDecorator($this->entityClassName),
+                new RelationsProviderDecorator($this->entityClassName)
+            )
+        ))->generate();
 
         if (!$this->force) {
             $this->output->write($addBody);
