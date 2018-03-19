@@ -38,6 +38,9 @@ class ReflectionInputFilter
             /** @var Column $annotation */
             $annotation = (new AnnotationReader())
                 ->getPropertyAnnotation($property, Column::class);
+            if (!$annotation) {
+                continue;
+            }
             $inputFilter[$property->getName()] = [
                 'required' => !$annotation->nullable,
                 'filters' => [

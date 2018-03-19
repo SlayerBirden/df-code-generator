@@ -37,7 +37,7 @@ class UniqueProviderDecorator implements DataProviderDecoratorInterface
             /** @var \Doctrine\ORM\Mapping\Column $annotation */
             $annotation = (new AnnotationReader())
                 ->getPropertyAnnotation($property, \Doctrine\ORM\Mapping\Column::class);
-            if ($annotation->unique) {
+            if ($annotation && $annotation->unique) {
                 $this->uniqueFields[] = $property->getName();
                 $this->hasUnique = true;
             }

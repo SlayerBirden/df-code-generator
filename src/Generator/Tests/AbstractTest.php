@@ -3,232 +3,153 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Generator\Tests;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\ManyToMany;
-use Doctrine\ORM\Mapping\ManyToOne;
-use Doctrine\ORM\Mapping\OneToOne;
-use Faker\Factory;
-use SlayerBirden\DFCodeGeneration\Generator\NamingTrait;
+use SlayerBirden\DFCodeGeneration\Generator\GeneratorInterface;
 
-abstract class AbstractTest
+abstract class AbstractTest implements GeneratorInterface
 {
-    use NamingTrait;
+    /**
+     * @var EntityProviderFactoryInterface
+     */
+    protected $entityProviderFactory;
     /**
      * @var string
      */
     protected $entityClassName;
-    protected $ids = [];
-    protected $relations = [
-        ManyToOne::class,
-        ManyToMany::class,
-        OneToOne::class,
-    ];
-    protected $haveInRepoParams = [];
-    protected $unique = [];
-    protected $existingRelations = [];
     /**
-     * @var string
+     * @var EntityProviderInterface[]
      */
-    protected $shortName;
+    protected $providers = [];
+    private $innerProviders = [];
+    private $appended = [];
 
-    public function __construct(string $entityClassName)
-    {
-        $this->entityClassName = $entityClassName;
-        $this->shortName = strtolower($this->getBaseName($this->entityClassName));
-    }
-
-    abstract public function generate(): string;
-
-    /**
-     * @param int $count
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
-    protected function getBefore(int $count = 1): string
-    {
-        $parts = [];
-        for ($i = 0; $i < $count; ++$i) {
-            $parts[] = $this->getHaveInRepoPhrase($this->entityClassName);
-        }
-
-        return implode(PHP_EOL, $parts);
-    }
-
-    /**
-     * @param string $entityClassName
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
-    protected function getHaveInRepoPhrase(string $entityClassName): string
-    {
-        $body = '$I->haveInRepository(%s, %s);';
-
-        $params = [];
-        $reflectionClassName = new \ReflectionClass($entityClassName);
-        foreach ($reflectionClassName->getProperties() as $property) {
-            $isId = false;
-            $key = $property->getName();
-            /** @var Id $id */
-            $id = (new AnnotationReader())
-                ->getPropertyAnnotation($property, Id::class);
-            if ($id) {
-                $isId = true;
-            }
-            foreach ($this->relations as $type) {
-                $annotation = (new AnnotationReader())
-                    ->getPropertyAnnotation($property, $type);
-                if ($annotation) {
-                    $body = $this->getRelationBody($body, $annotation->targetEntity, $key, $params, $type);
-                    continue 2;
-                }
-            }
-            $params[$key] = $this->getColumnValue($property, $entityClassName, $isId);
-        }
-        $this->haveInRepoParams[$entityClassName][] = $params;
-
-        return sprintf($body, $entityClassName, var_export($params, true));
-    }
-
-    protected function getHaveInRepoParams(string $entityClassName, int $idx = 0): array
-    {
-        if (isset($this->haveInRepoParams[$entityClassName]) && isset($this->haveInRepoParams[$entityClassName][$idx])) {
-            return $this->haveInRepoParams[$entityClassName][$idx];
-        }
-        return [];
-    }
-
-    /**
-     * @param \ReflectionProperty $property
-     * @param string $entityClassName
-     * @param bool $isId
-     * @return \DateTime|int|string|null
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     */
-    protected function getColumnValue(\ReflectionProperty $property, string $entityClassName, bool $isId)
-    {
-        $faker = Factory::create();
-        /** @var Column $column */
-        $column = (new AnnotationReader())
-            ->getPropertyAnnotation($property, Column::class);
-        $value = null;
-        if (!$column->nullable) {
-            switch ($column->type) {
-                case 'string':
-                    $value = $faker->word;
-                    break;
-                case 'integer':
-                    if ($isId) {
-                        $value = $this->getIncrId($entityClassName);
-                    } else {
-                        $value = $faker->numberBetween(1, 10);
-                    }
-                    break;
-                case 'datetime':
-                    $value = $faker->dateTime();
-                    break;
-            }
-        }
-        if ($column->unique) {
-            $this->addUnique($entityClassName, $property->getName());
-        }
-        return $value;
-    }
-
-    protected function addUnique(string $entityClassName, string $column): void
-    {
-        if (isset($this->unique[$entityClassName])) {
-            $this->unique[$entityClassName][] = $column;
-        } else {
-            $this->unique[$entityClassName] = [$column];
-        }
-    }
-
-    /**
-     * @param string $body
-     * @param string $entityClassName
-     * @param string $key
-     * @param array $params
-     * @param string $type
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
-    protected function getRelationBody(
-        string $body,
+    public function __construct(
         string $entityClassName,
-        string $key,
-        array &$params,
-        string $type
-    ): string {
-        $shortName = strtolower($this->getBaseName($entityClassName));
-        if (!in_array($shortName, $this->existingRelations, true) || $type !== OneToOne::class) {
-            $oldBody = $body;
-            $body = $this->getHaveInRepoPhrase($entityClassName);
-            $body .= PHP_EOL . $this->getUsagePhrase($shortName, $entityClassName, $this->getId($entityClassName));
-            $body .= PHP_EOL . $oldBody;
-            $this->existingRelations[] = $shortName;
-        }
-        $params[$key] = '$' . $shortName;
+        EntityProviderFactoryInterface $entityProviderFactory
+    ) {
+        $this->entityProviderFactory = $entityProviderFactory;
+        $this->entityClassName = $entityClassName;
+    }
 
+    protected function getLatestProvider()
+    {
+        if (count($this->providers)) {
+            return end($this->providers);
+        } else {
+            return $this->entityProviderFactory->create($this->entityClassName);
+        }
+    }
+
+    protected function generateHaveInRepo(int $count = 1): string
+    {
+        $generated = 0;
+        $body = '';
+        while ($generated < $count) {
+            $provider = $this->entityProviderFactory->create($this->entityClassName);
+            $body .= $this->getHaveInRepoPhrase($provider);
+            $this->providers[] = $provider;
+            $generated++;
+        }
         return $body;
     }
 
-    protected function getIncrId(string $entityClassName): int
+    private function getInnerProvider(string $entity): EntityProviderInterface
     {
-        if (isset($this->ids[$entityClassName])) {
-            return ++$this->ids[$entityClassName];
-        } else {
-            return $this->ids[$entityClassName] = 1;
+        if (!isset($this->innerProviders[$entity])) {
+            $this->innerProviders[$entity] = $this->entityProviderFactory->create($entity);
         }
+
+        return $this->innerProviders[$entity];
     }
 
-    protected function getId(string $entityClassName): ?int
+    private function appendOnce(string $content, string $to)
     {
-        if (isset($this->ids[$entityClassName])) {
-            return $this->ids[$entityClassName];
+        if (in_array($content, $this->appended, true)) {
+            return $to;
         }
-        return null;
+        $this->appended[] = $content;
+        return $to . $content;
     }
 
-    protected function getUsagePhrase(string $shortName, string $entityClassName, int $id): string
+    private function getHaveInRepoPhrase(EntityProviderInterface $provider): string
+    {
+        $body = '';
+
+        $params = [];
+        foreach ($provider->getEntitySpec() as $item) {
+            $key = $item['name'];
+            $type = $item['type'];
+            $entity = $item['entity'] ?? '';
+            switch ($type) {
+                case 'manytoone':
+                    $innerProvider = $this->getInnerProvider($entity);
+                    $body = $this->appendOnce(
+                        $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider),
+                        $body
+                    );
+                    $params[$key] = '$' . $innerProvider->getShortName();
+                    break;
+                case 'manytomany':
+                    $innerProvider = $this->getInnerProvider($entity);
+                    $body = $this->appendOnce(
+                        $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider),
+                        $body
+                    );
+                    $params[$key] = '[$' . $innerProvider->getShortName() . ']';
+                    break;
+                case 'onetoone':
+                    $innerProvider = $this->entityProviderFactory->create($entity);
+                    $body .= $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider);
+                    $params[$key] = '$' . $innerProvider->getShortName();
+                    break;
+                default:
+                    $params[$key] = new ProviderValuePromise($provider, $key);
+                    break;
+            }
+        }
+
+        $params = $this->resolvePromises($params);
+
+        $body .= '$I->haveInRepository(%1$s, %2$s);';
+        $args = [
+            '\'' . $provider->getEntityClassName() . '\'',
+            var_export($params, true),
+        ];
+        $body = sprintf($body, ...$args);
+        $body = preg_replace("/'(\\[?\\$\w*\\]?)'/", '$1', $body);
+
+        return $body . PHP_EOL;
+    }
+
+    private function resolvePromises(array $params): array
+    {
+        return array_map(function ($item) {
+            if ($item instanceof ProviderValuePromise) {
+                return $item->resolve();
+            }
+            return $item;
+        }, $params);
+    }
+
+    protected function getHaveInRepoParams(int $idx = 0): array
+    {
+        if (isset($this->providers[$idx])) {
+            return $this->providers[$idx]->getPostParams();
+        }
+
+        throw new \InvalidArgumentException('Wrong id provided.');
+    }
+
+    protected function getUsagePhrase(EntityProviderInterface $provider): string
     {
         $body = '$%s = $I->grabEntityFromRepository(%s, [\'id\' => %d]);';
 
-        return sprintf($body, $shortName, $entityClassName, $id);
-    }
+        $args = [
+            $provider->getShortName(),
+            '\'' . $provider->getEntityClassName() . '\'',
+            $provider->getId(),
+        ];
+        $body = sprintf($body, ...$args);
 
-    /**
-     * @return array
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
-    protected function getPostParams(): array
-    {
-        $params = [];
-        $reflectionClassName = new \ReflectionClass($this->entityClassName);
-        foreach ($reflectionClassName->getProperties() as $property) {
-            $key = $property->getName();
-            /** @var Id $id */
-            $id = (new AnnotationReader())
-                ->getPropertyAnnotation($property, Id::class);
-            if ($id) {
-                continue;
-            }
-            foreach ($this->relations as $type) {
-                $annotation = (new AnnotationReader())
-                    ->getPropertyAnnotation($property, $type);
-                if ($annotation) {
-                    $params[$key] = $this->getId($annotation->targetEntity);
-                    continue;
-                }
-            }
-            $params[$key] = $this->getColumnValue($property, $this->entityClassName, false);
-        }
-
-        return $params;
+        return $body . PHP_EOL;
     }
 }

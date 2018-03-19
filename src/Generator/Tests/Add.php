@@ -10,37 +10,30 @@ use Zend\Code\Generator\ParameterGenerator;
 
 class Add extends AbstractTest
 {
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     public function generate(): string
     {
-        $className = 'Add' . $this->getBaseName($this->entityClassName) . 'Cest';
-        $baseName = $this->getBaseName($this->entityClassName);
-        $class = new ClassGenerator($className);
+        $class = new ClassGenerator($this->getClassName());
 
         $class->addMethodFromGenerator(
             (new MethodGenerator('_before'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
-                ->setBody($this->getBefore())
+                ->setBody($this->generateHaveInRepo())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('add' . $baseName))
+            (new MethodGenerator('addEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getSuccessCase())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('addInvalid' . $baseName))
+            (new MethodGenerator('addInvalidEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getValidationCase())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('addFailedConstraint' . $baseName))
+            (new MethodGenerator('addFailedConstraintEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getUniqueConstraintCase())
         );
@@ -50,11 +43,6 @@ class Add extends AbstractTest
             ->generate();
     }
 
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     private function getSuccessCase(): string
     {
         $body = <<<'BODY'
@@ -70,18 +58,15 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
+        $provider = $this->entityProviderFactory->create($this->entityClassName);
 
-        return sprintf($body, $this->shortName, var_export($this->getPostParams(), true));
+        return sprintf($body, $provider->getShortName(), var_export($provider->getPostParams(), true));
     }
 
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     private function getValidationCase(): string
     {
-        $params = $this->getPostParams();
+        $provider = $this->entityProviderFactory->create($this->entityClassName);
+        $params = $provider->getPostParams();
         if (count($params) > 0) {
             $body = <<<'BODY'
 $I->wantTo('create incomplete %1$s');
@@ -104,7 +89,7 @@ BODY;
                 unset($params[$key]);
                 break;
             }
-            return sprintf($body, $this->shortName, var_export($params, true), var_export($validation, true));
+            return sprintf($body, $provider->getShortName(), var_export($params, true), var_export($validation, true));
         } else {
             return '//TODO add validation case';
         }
@@ -112,11 +97,11 @@ BODY;
 
     private function getUniqueConstraintCase(): string
     {
-        if (empty($this->unique)) {
+        if (!$this->getLatestProvider()->hasUnique()) {
             return '//TODO add unique case';
         }
 
-        $params = $this->getHaveInRepoParams($this->entityClassName);
+        $params = $this->getHaveInRepoParams();
         foreach ($params as $key => $param) {
             if (is_object($param) && method_exists($param, 'getId')) {
                 $params[$key] = $param->getId();
@@ -133,6 +118,11 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
-        return sprintf($body, $this->shortName, var_export($params, true));
+        return sprintf($body, $this->getLatestProvider()->getShortName(), var_export($params, true));
+    }
+
+    public function getClassName(): string
+    {
+        return 'Add' . $this->getLatestProvider()->getBaseName() . 'Cest';
     }
 }

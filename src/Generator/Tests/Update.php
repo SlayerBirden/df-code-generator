@@ -10,49 +10,42 @@ use Zend\Code\Generator\ParameterGenerator;
 
 class Update extends AbstractTest
 {
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     public function generate(): string
     {
-        $className = 'Update' . $this->getBaseName($this->entityClassName) . 'Cest';
-        $baseName = $this->getBaseName($this->entityClassName);
-        $class = new ClassGenerator($className);
+        $class = new ClassGenerator($this->getClassName());
 
         $class->addMethodFromGenerator(
             (new MethodGenerator('_before'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
-                ->setBody($this->getBefore(2))
+                ->setBody($this->generateHaveInRepo(2))
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('update' . $baseName))
+            (new MethodGenerator('updateEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getSuccessCase())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('updateNonExisting' . $baseName))
+            (new MethodGenerator('updateNonExistingEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getNonExistingCase())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('updateSetId' . $baseName))
+            (new MethodGenerator('updateSetIdEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getUpdateSetIdCase())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('updateInvalidInput' . $baseName))
+            (new MethodGenerator('updateInvalidInput'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getInvalidInputCase())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('updateFailedConstraint' . $baseName))
+            (new MethodGenerator('updateFailedConstraint'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getUniqueConstraintCase())
         );
@@ -62,11 +55,6 @@ class Update extends AbstractTest
             ->generate();
     }
 
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     private function getSuccessCase(): string
     {
         $body = <<<'BODY'
@@ -82,16 +70,12 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
+        $provider = $this->entityProviderFactory->create($this->entityClassName);
 
-        return sprintf($body, $this->shortName, $this->getId($this->entityClassName),
-            var_export($this->getPostParams(), true));
+        return sprintf($body, $provider->getShortName(), $this->getLatestProvider()->getId(),
+            var_export($provider->getPostParams(), true));
     }
 
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     private function getNonExistingCase(): string
     {
         $body = <<<'BODY'
@@ -107,20 +91,17 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
-        return sprintf($body, $this->shortName, var_export($this->getPostParams(), true));
+        $provider = $this->entityProviderFactory->create($this->entityClassName);
+
+        return sprintf($body, $provider->getShortName(), var_export($provider->getPostParams(), true));
     }
 
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     private function getUpdateSetIdCase(): string
     {
         $body = <<<'BODY'
 $I->wantTo('update %1$s and attempt to set id');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPUT('/%1$s/1', %2$s);
+$I->sendPUT('/%1$s/%4$d', %2$s);
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
     'success' => true,
@@ -129,29 +110,30 @@ $I->seeResponseContainsJson([
     ]
 ]);
 BODY;
-        $params = $this->getPostParams();
-        $paramsWithId = $params;
-        $paramsWithId['id'] = 2;
+        $first = reset($this->providers);
+        $last = end($this->providers);
 
-        $expected = $params;
-        $expected['id'] = 1;
 
-        return sprintf($body, $this->shortName, var_export($paramsWithId, true), var_export($expected, true));
+        $provider = $this->entityProviderFactory->create($this->entityClassName);
+        $paramsWithId = $provider->getPostParams();
+        $paramsWithId['id'] = $last->getId();
+
+        $expected = $provider->getPostParams();
+        $expected['id'] = $first->getId();
+
+        return sprintf($body, $provider->getShortName(), var_export($paramsWithId, true), var_export($expected, true),
+            $first->getId());
     }
 
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     private function getInvalidInputCase(): string
     {
-        $params = $this->getPostParams();
+        $provider = $this->entityProviderFactory->create($this->entityClassName);
+        $params = $provider->getPostParams();
         if (count($params) > 0) {
             $body = <<<'BODY'
 $I->wantTo('update %1$s set invalid input');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPUT('/%1$s/1', %2$s);
+$I->sendPUT('/%1$s/%4$d', %2$s);
 $I->seeResponseCodeIs(HttpCode::BAD_REQUEST);
 $I->seeResponseContainsJson([
     'success' => false,
@@ -169,7 +151,8 @@ BODY;
                 unset($params[$key]);
                 break;
             }
-            return sprintf($body, $this->shortName, var_export($params, true), var_export($validation, true));
+            return sprintf($body, $provider->getShortName(), var_export($params, true), var_export($validation, true),
+                $this->getLatestProvider()->getId());
         } else {
             return '//TODO add validation case';
         }
@@ -177,30 +160,28 @@ BODY;
 
     private function getUniqueConstraintCase(): string
     {
-        if (empty($this->unique)) {
+        if (!$this->getLatestProvider()->hasUnique()) {
             return '//TODO add unique case';
         }
 
-        $params = $this->getHaveInRepoParams($this->entityClassName);
-        foreach ($params as $key => $param) {
-            if ($key === 'id') {
-                unset($params[$key]);
-            }
-            if (is_object($param) && method_exists($param, 'getId')) {
-                $params[$key] = $param->getId();
-            }
-        }
+        $params = $this->getHaveInRepoParams();
 
         $body = <<<'BODY'
 $I->wantTo('update %1$s, fail constraint');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPUT('/%1$s/2', %2$s);
+$I->sendPUT('/%1$s/%3$d', %2$s);
 $I->seeResponseCodeIs(HttpCode::BAD_REQUEST);
 $I->seeResponseContainsJson([
     'success' => false,
 ]);
 BODY;
 
-        return sprintf($body, $this->shortName, var_export($params, true));
+        return sprintf($body, $this->getLatestProvider()->getShortName(), var_export($params, true),
+            $this->getLatestProvider()->getId());
+    }
+
+    public function getClassName(): string
+    {
+        return 'Update' . $this->getLatestProvider()->getBaseName() . 'Cest';
     }
 }

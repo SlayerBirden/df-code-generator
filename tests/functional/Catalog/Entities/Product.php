@@ -25,6 +25,17 @@ class Product
      * @var string
      **/
     private $sku;
+    /**
+     * @ORM\ManyToMany(targetEntity="\SlayerBirden\DFCodeGeneration\Catalog\Entities\Category")
+     * @var Category[]
+     */
+    private $categories;
+    /**
+     * @ORM\OneToOne(targetEntity="\SlayerBirden\DFCodeGeneration\Catalog\Entities\Stock")
+     * @ORM\JoinColumn(nullable=false)
+     * @var Stock
+     */
+    private $stock;
 
     /**
      * @return int|null
@@ -64,5 +75,37 @@ class Product
     public function setSku(string $sku): void
     {
         $this->sku = $sku;
+    }
+
+    /**
+     * @return Stock
+     */
+    public function getStock(): Stock
+    {
+        return $this->stock;
+    }
+
+    /**
+     * @param Stock $stock
+     */
+    public function setStock(Stock $stock): void
+    {
+        $this->stock = $stock;
+    }
+
+    /**
+     * @return Category[]
+     */
+    public function getCategories(): array
+    {
+        return $this->categories;
+    }
+
+    /**
+     * @param Category[] $categories
+     */
+    public function setCategories(array $categories): void
+    {
+        $this->categories = $categories;
     }
 }

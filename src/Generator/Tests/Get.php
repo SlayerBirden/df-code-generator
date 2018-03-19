@@ -10,31 +10,24 @@ use Zend\Code\Generator\ParameterGenerator;
 
 class Get extends AbstractTest
 {
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     public function generate(): string
     {
-        $className = 'Get' . $this->getBaseName($this->entityClassName) . 'Cest';
-        $baseName = $this->getBaseName($this->entityClassName);
-        $class = new ClassGenerator($className);
+        $class = new ClassGenerator($this->getClassName());
 
         $class->addMethodFromGenerator(
             (new MethodGenerator('_before'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
-                ->setBody($this->getBefore())
+                ->setBody($this->generateHaveInRepo())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('get' . $baseName))
+            (new MethodGenerator('getEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getSuccessCase())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('getNonExisting' . $baseName))
+            (new MethodGenerator('getNonExistingEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getNonExistingCase())
         );
@@ -59,13 +52,9 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
-        $id = $this->getId($this->entityClassName);
-        $params = $this->getHaveInRepoParams($this->entityClassName);
-        if (isset($params['id'])) {
-            unset($params['id']);
-        }
+        $provider = $this->getLatestProvider();
 
-        return sprintf($body, $this->shortName, $id, var_export($params, true));
+        return sprintf($body, $provider->getShortName(), $provider->getId(), var_export($provider->getPostParams(), true));
     }
 
     private function getNonExistingCase(): string
@@ -83,6 +72,11 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
-        return sprintf($body, $this->shortName);
+        return sprintf($body, $this->getLatestProvider()->getShortName());
+    }
+
+    public function getClassName(): string
+    {
+        return 'Get' . $this->getLatestProvider()->getBaseName() . 'Cest';
     }
 }

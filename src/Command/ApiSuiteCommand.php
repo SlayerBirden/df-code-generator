@@ -19,6 +19,8 @@ use SlayerBirden\DFCodeGeneration\Generator\Tests\Add as TestAdd;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Delete as TestDelete;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Get as TestGet;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Gets as TestGets;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\IdRegistry;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\ReflectionProviderFactory;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Update as TestUpdate;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\SimpleProvider;
 use Symfony\Component\Console\Command\Command;
@@ -87,17 +89,15 @@ class ApiSuiteCommand extends Command
         }
     }
 
-    /**
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     private function generateTests(): void
     {
-        $addBody = (new TestAdd($this->entityClassName))->generate();
-        $deleteBody = (new TestDelete($this->entityClassName))->generate();
-        $getBody = (new TestGet($this->entityClassName))->generate();
-        $getsBody = (new TestGets($this->entityClassName))->generate();
-        $updateBody = (new TestUpdate($this->entityClassName))->generate();
+        $entityProviderFactory = new ReflectionProviderFactory(new IdRegistry());
+
+        $addBody = (new TestAdd($this->entityClassName, $entityProviderFactory))->generate();
+        $deleteBody = (new TestDelete($this->entityClassName, $entityProviderFactory))->generate();
+        $getBody = (new TestGet($this->entityClassName, $entityProviderFactory))->generate();
+        $getsBody = (new TestGets($this->entityClassName, $entityProviderFactory))->generate();
+        $updateBody = (new TestUpdate($this->entityClassName, $entityProviderFactory))->generate();
         if (!$this->force) {
             $this->output->write($addBody);
             $this->output->write($deleteBody);

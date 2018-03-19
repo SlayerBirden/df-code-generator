@@ -11,20 +11,14 @@ use Zend\Code\Generator\ParameterGenerator;
 
 class Gets extends AbstractTest
 {
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     public function generate(): string
     {
-        $className = 'Get' . $this->getBaseName($this->entityClassName) . 'sCest';
-        $class = new ClassGenerator($className);
+        $class = new ClassGenerator($this->getClassName());
 
         $class->addMethodFromGenerator(
             (new MethodGenerator('_before'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
-                ->setBody($this->getBefore(11))
+                ->setBody($this->generateHaveInRepo(11))
         );
 
         $class->addMethodFromGenerator(
@@ -84,9 +78,16 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
-        $allParams = $this->haveInRepoParams[$this->entityClassName] ?? [];
+        $allParams = $this->getAllParams();
 
-        return sprintf($body, $this->shortName, var_export($allParams, true));
+        return sprintf($body, $this->getLatestProvider()->getShortName(), var_export($allParams, true));
+    }
+
+    private function getAllParams(): array
+    {
+        return array_map(function (EntityProviderInterface $provider) {
+            return $provider->getPostParams();
+        }, $this->providers);
     }
 
     private function getSecondPage(): string
@@ -106,10 +107,10 @@ $I->seeResponseContainsJson([
 BODY;
 
         $params = [
-            $this->getHaveInRepoParams($this->entityClassName, 10)
+            $this->getHaveInRepoParams(10)
         ];
 
-        return sprintf($body, $this->shortName, var_export($params, true));
+        return sprintf($body, $this->getLatestProvider()->getBaseName(), var_export($params, true));
     }
 
     private function getFiltered(): string
@@ -128,7 +129,7 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
-        $chosen = $this->getHaveInRepoParams($this->entityClassName, 5);
+        $chosen = $this->getHaveInRepoParams(5);
 
         $key = $this->getKey($chosen);
         if (empty($key)) {
@@ -137,7 +138,7 @@ BODY;
         $value = $chosen[$key];
 
         $found = [];
-        $all = $this->haveInRepoParams[$this->entityClassName] ?? [];
+        $all = $this->getAllParams();
         foreach ($all as $item) {
             if ($item[$key] === $value) {
                 $found[] = $item;
@@ -145,14 +146,14 @@ BODY;
         }
         $filterString = "f[$key]=$value";
 
-        return sprintf($body, $this->shortName, $filterString, var_export($found, true), count($found));
+        return sprintf($body, $this->getLatestProvider()->getShortName(), $filterString, var_export($found, true), count($found));
     }
 
     private function getKey(array $item): string
     {
         $key = '';
         foreach ($item as $key => $value) {
-            if ($key === 'id') {
+            if ($key === $this->getLatestProvider()->getIdName()) {
                 continue;
             }
             break;
@@ -176,7 +177,7 @@ $I->seeResponseContainsJson([
     ]
 ]);
 BODY;
-        $chosen = $this->getHaveInRepoParams($this->entityClassName, 5);
+        $chosen = $this->getHaveInRepoParams(5);
 
         $key = $this->getKey($chosen);
 
@@ -184,12 +185,12 @@ BODY;
             return '//TODO add sorted case';
         }
 
-        $all = $this->haveInRepoParams[$this->entityClassName] ?? [];
+        $all = $this->getAllParams();
         usort($all, function (array $a, array $b) use ($key) {
             return strcmp($a[$key], $b[$key]);
         });
 
-        return sprintf($body, $this->shortName, $key, var_export($all, true));
+        return sprintf($body, $this->getLatestProvider()->getShortName(), $key, var_export($all, true));
     }
 
     private function getNoResultsFilter(): string
@@ -208,7 +209,7 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
-        $chosen = $this->getHaveInRepoParams($this->entityClassName, 5);
+        $chosen = $this->getHaveInRepoParams(5);
 
 
         $key = $this->getKey($chosen);
@@ -218,7 +219,7 @@ BODY;
         $value = $this->getWrongValue($key);
         $filterString = "f[$key]=$value";
 
-        return sprintf($body, $this->shortName, $filterString);
+        return sprintf($body, $this->getLatestProvider()->getShortName(), $filterString);
     }
 
     private function getWrongValue(string $key): string
@@ -238,7 +239,7 @@ BODY;
     private function getWrongKey(): string
     {
         $faker = Factory::create();
-        $item = $this->getHaveInRepoParams($this->entityClassName);
+        $item = $this->getHaveInRepoParams();
         $keys = array_keys($item);
         do {
             $wrongKey = $faker->word;
@@ -265,6 +266,11 @@ BODY;
         $key = $this->getWrongKey();
         $filter = "f[$key]={$this->getWrongValue($key)}";
 
-        return sprintf($body, $this->shortName, $filter);
+        return sprintf($body, $this->getLatestProvider()->getShortName(), $filter);
+    }
+
+    public function getClassName(): string
+    {
+        return 'Get' . $this->getLatestProvider()->getBaseName() . 'sCest';
     }
 }

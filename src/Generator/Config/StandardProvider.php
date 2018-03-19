@@ -3,18 +3,13 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Generator\Config;
 
-use SlayerBirden\DFCodeGeneration\Generator\Factory\NamingTrait as FactoryNamingTrait;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\NamingTrait as ControllerNamingTrait;
+use SlayerBirden\DFCodeGeneration\Generator\BaseNameTrait;
+use SlayerBirden\DFCodeGeneration\Generator\Factory\SimpleProvider as FactoryProvider;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\SimpleProvider as ControllerProvider;
 
 class StandardProvider implements DataProviderInterface
 {
-    use FactoryNamingTrait, ControllerNamingTrait {
-        FactoryNamingTrait::getBaseName insteadof ControllerNamingTrait;
-        FactoryNamingTrait::getNs insteadof ControllerNamingTrait;
-        FactoryNamingTrait::getNs as getFactoryNs;
-        ControllerNamingTrait::getNs as getControllerNs;
-    }
-
+    use BaseNameTrait;
     /**
      * @var string
      */
@@ -31,8 +26,10 @@ class StandardProvider implements DataProviderInterface
      */
     public function getRouteFactoryName(): string
     {
-        $baseName = $this->getBaseName($this->entityClassName);
-        return $this->getFactoryNs($this->entityClassName) . "\\{$baseName}RoutesDelegator";
+        $baseName = $this->getBaseName();
+        $factoryParams = (new FactoryProvider($this->entityClassName))->provide();
+
+        return $factoryParams['ns'] . "\\{$baseName}RoutesDelegator";
     }
 
     /**
@@ -74,13 +71,14 @@ class StandardProvider implements DataProviderInterface
      */
     public function getControllerName(string $type): string
     {
-        $baseName = $this->getBaseName($this->entityClassName);
+        $baseName = $this->getBaseName();
+        $controllerParams = (new ControllerProvider($this->entityClassName))->provide();
         if ($type === 'gets') {
             $baseName .= 's';
             $type = 'get';
         }
 
-        return $this->getControllerNs($this->entityClassName) . '\\' . ucwords($type) . $baseName . 'Action';
+        return $controllerParams['ns'] . '\\' . ucwords($type) . $baseName . 'Action';
     }
 
     public function getConfigNameSpace(): string
@@ -97,6 +95,6 @@ class StandardProvider implements DataProviderInterface
      */
     public function getInputFilterName(): string
     {
-        return $this->getBaseName($this->entityClassName) . 'InputFilter';
+        return $this->getBaseName() . 'InputFilter';
     }
 }

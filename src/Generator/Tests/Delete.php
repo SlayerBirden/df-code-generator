@@ -10,31 +10,24 @@ use Zend\Code\Generator\ParameterGenerator;
 
 class Delete extends AbstractTest
 {
-    /**
-     * @return string
-     * @throws \Doctrine\Common\Annotations\AnnotationException
-     * @throws \ReflectionException
-     */
     public function generate(): string
     {
-        $className = 'Delete' . $this->getBaseName($this->entityClassName) . 'Cest';
-        $baseName = $this->getBaseName($this->entityClassName);
-        $class = new ClassGenerator($className);
+        $class = new ClassGenerator($this->getClassName());
 
         $class->addMethodFromGenerator(
             (new MethodGenerator('_before'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
-                ->setBody($this->getBefore())
+                ->setBody($this->generateHaveInRepo())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('delete' . $baseName))
+            (new MethodGenerator('deleteEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getSuccessCase())
         );
 
         $class->addMethodFromGenerator(
-            (new MethodGenerator('deleteNonExisting' . $baseName))
+            (new MethodGenerator('deleteNonExistingEntity'))
                 ->setParameter((new ParameterGenerator('I'))->setType('\ApiTester'))
                 ->setBody($this->getNonExistingCase())
         );
@@ -58,14 +51,9 @@ $I->seeResponseContainsJson([
     ]
 ]);
 BODY;
+        $provider = $this->getLatestProvider();
 
-        $id = $this->getId($this->entityClassName);
-        $params = $this->getHaveInRepoParams($this->entityClassName);
-        if (isset($params['id'])) {
-            unset($params['id']);
-        }
-
-        return sprintf($body, $this->shortName, $id, var_export($params, true));
+        return sprintf($body, $provider->getShortName(), $provider->getId(), var_export($provider->getPostParams(), true));
     }
 
     private function getNonExistingCase(): string
@@ -83,6 +71,11 @@ $I->seeResponseContainsJson([
 ]);
 BODY;
 
-        return sprintf($body, $this->shortName);
+        return sprintf($body, $this->getLatestProvider()->getShortName());
+    }
+
+    public function getClassName(): string
+    {
+        return 'Delete' . $this->getLatestProvider()->getBaseName() . 'Cest';
     }
 }

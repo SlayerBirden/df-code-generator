@@ -3,15 +3,12 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Generator\Factory;
 
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\NamingTrait as ControllerNamingTrait;
+use SlayerBirden\DFCodeGeneration\Generator\BaseNameTrait;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\SimpleProvider as ControllerDataProvider;
 
 class SimpleProvider implements DataProviderInterface
 {
-    use NamingTrait, ControllerNamingTrait {
-        NamingTrait::getBaseName insteadof ControllerNamingTrait;
-        NamingTrait::getNs insteadof ControllerNamingTrait;
-        ControllerNamingTrait::getNs as getControllerNs;
-    }
+    use BaseNameTrait;
 
     /**
      * @var string
@@ -29,11 +26,23 @@ class SimpleProvider implements DataProviderInterface
      */
     public function provide(): array
     {
+        $controllerParams = (new ControllerDataProvider($this->entityClassName))->provide();
+
         return [
-            'ns' => $this->getNs($this->entityClassName),
-            'controllerNs' => $this->getControllerNs($this->entityClassName),
-            'entityName' => $this->getBaseName($this->entityClassName),
+            'ns' => $this->getNs(),
+            'controllerNs' => $controllerParams['ns'],
+            'entityName' => $this->getBaseName(),
         ];
+    }
+
+    private function getNs(): string
+    {
+        $parts = explode('\\', $this->entityClassName);
+        array_splice($parts, -2); // Entities\Model
+
+        $parts[] = 'Factory';
+
+        return ltrim(implode('\\', $parts), '\\');
     }
 
     /**
@@ -42,6 +51,6 @@ class SimpleProvider implements DataProviderInterface
      */
     public function getClassName(): string
     {
-        return $this->getNs($this->entityClassName) . '\\' . $this->getBaseName($this->entityClassName) . 'RoutesDelegator';
+        return $this->getNs() . '\\' . $this->getBaseName() . 'RoutesDelegator';
     }
 }

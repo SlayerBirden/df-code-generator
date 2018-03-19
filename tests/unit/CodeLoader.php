@@ -11,17 +11,17 @@ class CodeLoader
     /**
      * @var vfsStreamDirectory
      */
-    static private $root ;
-    static private $declared = [];
+    private static $root ;
+    private static $declared = [];
 
-    static private function init()
+    private static function init()
     {
         if (self::$root === null) {
             self::$root = vfsStream::setup();
         }
     }
 
-    static public function loadCode(string $code, string $fileName): void
+    public static function loadCode(string $code, string $fileName): void
     {
         self::init();
         if (!self::isDeclared($code)) {
@@ -31,7 +31,7 @@ class CodeLoader
         }
     }
 
-    static private function isDeclared(string $code): bool
+    private static function isDeclared(string $code): bool
     {
         return in_array(md5($code), self::$declared);
     }

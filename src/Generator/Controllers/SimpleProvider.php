@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Generator\Controllers;
 
+use SlayerBirden\DFCodeGeneration\Generator\BaseNameTrait;
+
 class SimpleProvider implements DataProviderInterface
 {
-    use NamingTrait;
+    use BaseNameTrait;
 
     /**
      * @var string
@@ -24,9 +26,9 @@ class SimpleProvider implements DataProviderInterface
     public function provide(): array
     {
         return [
-            'ns' => $this->getNs($this->entityClassName),
+            'ns' => $this->getNs(),
             'useStatement' => ltrim($this->entityClassName, '\\'),
-            'entityName' => $this->getBaseName($this->entityClassName),
+            'entityName' => $this->getBaseName(),
         ];
     }
 
@@ -38,11 +40,21 @@ class SimpleProvider implements DataProviderInterface
     public function getClassName(string $type): string
     {
         if ($type === 'gets') {
-            $className = 'Get' . $this->getBaseName($this->entityClassName) . 'sAction';
+            $className = 'Get' . $this->getBaseName() . 'sAction';
         } else {
-            $className = ucwords($type) . $this->getBaseName($this->entityClassName) . 'Action';
+            $className = ucwords($type) . $this->getBaseName() . 'Action';
         }
 
-        return $this->getNs($this->entityClassName) . "\\$className";
+        return $this->getNs() . "\\$className";
+    }
+
+    private function getNs(): string
+    {
+        $parts = explode('\\', $this->entityClassName);
+        array_splice($parts, -2); // Entities\Model
+
+        $parts[] = 'Controller';
+
+        return ltrim(implode('\\', $parts), '\\');
     }
 }
