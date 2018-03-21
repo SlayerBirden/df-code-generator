@@ -26,6 +26,11 @@ class Product
      **/
     private $sku;
     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var string
+     **/
+    private $title;
+    /**
      * @ORM\ManyToMany(targetEntity="\SlayerBirden\DFCodeGeneration\Catalog\Entities\Category")
      * @var Category[]
      */
@@ -59,6 +64,22 @@ class Product
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
     }
 
     /**

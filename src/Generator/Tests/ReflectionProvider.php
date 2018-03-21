@@ -71,6 +71,7 @@ class ReflectionProvider implements EntityProviderInterface
         if (empty($this->spec)) {
             $reflectionClassName = new ClassReflection($this->entityClassName);
             foreach ($reflectionClassName->getProperties() as $property) {
+                $columnType = '';
                 foreach ($this->relations as $type) {
                     /** @var ManyToMany|OneToOne|ManyToOne $annotation */
                     $annotation = (new AnnotationReader())
@@ -85,6 +86,8 @@ class ReflectionProvider implements EntityProviderInterface
                         if ($joinColumn) {
                             $nullable = $joinColumn->nullable;
                             $referenceColumn = $joinColumn->referencedColumnName;
+                        } else {
+                            $nullable = true;
                         }
                         break;
                     }
@@ -95,15 +98,22 @@ class ReflectionProvider implements EntityProviderInterface
                     $column = (new AnnotationReader())
                         ->getPropertyAnnotation($property, Column::class);
                     $columnType = $column->type;
+                    $nullable = $column->nullable;
                 }
 
-                $this->spec[] = [
+                $spec = [
                     'name' => $property->getName(),
                     'type' => $columnType,
-                    'entity' => $target ?? null,
                     'nullable' => $nullable ?? false,
-                    'ref_column_key' => $referenceColumn ?? 'id',
+                    'reference' => null,
                 ];
+                if (isset($target)) {
+                    $spec['reference'] = [
+                        'entity' => $target,
+                        'ref_column_key' => $referenceColumn ?? 'id',
+                    ];
+                }
+                $this->spec[] = $spec;
             }
         }
 
@@ -153,7 +163,8 @@ class ReflectionProvider implements EntityProviderInterface
      */
     public function getId()
     {
-        return $this->params[$this->getIdName()];
+        $params = $this->getParams();
+        return $params[$this->getIdName()];
     }
 
     /**

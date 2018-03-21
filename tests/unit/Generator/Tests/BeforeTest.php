@@ -34,8 +34,10 @@ class BeforeTest extends TestCase
             [
                 'name' => 'group',
                 'type' => 'manytoone',
-                'entity' => 'Dummy\\Group',
                 'nullable' => false,
+                'reference' => [
+                    'entity' => 'Dummy\\Group',
+                ]
             ],
         ], [
             'name' => 'Bob',
@@ -185,7 +187,9 @@ BODY;
             [
                 'name' => 'group',
                 'type' => 'manytoone',
-                'entity' => 'Dummy\\Group',
+                'reference' => [
+                    'entity' => 'Dummy\\Group',
+                ],
                 'nullable' => false,
             ],
         ], [
@@ -271,7 +275,9 @@ BODY;
             [
                 'name' => 'groups',
                 'type' => 'manytomany',
-                'entity' => 'Dummy\\Group',
+                'reference' => [
+                    'entity' => 'Dummy\\Group',
+                ],
                 'nullable' => false,
             ],
         ];
@@ -384,7 +390,9 @@ BODY;
             [
                 'name' => 'group',
                 'type' => 'manytoone',
-                'entity' => 'Dummy\\Group',
+                'reference' => [
+                    'entity' => 'Dummy\\Group',
+                ],
                 'nullable' => true,
             ],
         ];
@@ -437,7 +445,9 @@ BODY;
             [
                 'name' => 'group',
                 'type' => 'manytoone',
-                'entity' => 'Dummy\\Group',
+                'reference' => [
+                    'entity' => 'Dummy\\Group',
+                ],
                 'nullable' => true,
             ],
         ];

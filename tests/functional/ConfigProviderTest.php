@@ -58,6 +58,14 @@ class ConfigProviderTest extends TestCase
                     ]
                 ],
             ],
+            'title' => [
+                'required' => false,
+                'filters' => [
+                    [
+                        'name' => 'stringtrim',
+                    ]
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $this->provider->getInputFilterSpec());

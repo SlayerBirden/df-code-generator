@@ -85,38 +85,41 @@ abstract class AbstractTest implements GeneratorInterface
         foreach ($provider->getEntitySpec() as $item) {
             $key = $item['name'];
             $type = $item['type'];
-            $entity = $item['entity'] ?? '';
+            $reference = $item['reference'] ?? [];
             $nullable = $item['nullable'] ?? false;
-            $referenceColumn = $item['ref_column_key'] ?? 'id';
             // Skip 50% of nullable values (by default)
             if ($nullable && rand(0,100)/100 > $this->probabilityOfFilledNullable) {
                 continue;
             }
-            switch ($type) {
-                case 'manytoone':
-                    $innerProvider = $this->getInnerProvider($entity);
-                    $body = $this->appendOnce(
-                        $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn),
-                        $body
-                    );
-                    $params[$key] = '$' . $innerProvider->getShortName();
-                    break;
-                case 'manytomany':
-                    $innerProvider = $this->getInnerProvider($entity);
-                    $body = $this->appendOnce(
-                        $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn),
-                        $body
-                    );
-                    $params[$key] = '[$' . $innerProvider->getShortName() . ']';
-                    break;
-                case 'onetoone':
-                    $innerProvider = $this->entityProviderFactory->create($entity);
-                    $body .= $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn);
-                    $params[$key] = '$' . $innerProvider->getShortName();
-                    break;
-                default:
-                    $params[$key] = new ProviderValuePromise($provider, $key);
-                    break;
+            if ($reference) {
+                $referenceColumn = $reference['ref_column_key'] ?? 'id';
+                $entity = $reference['entity'];
+
+                switch ($type) {
+                    case 'manytoone':
+                        $innerProvider = $this->getInnerProvider($entity);
+                        $body = $this->appendOnce(
+                            $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn),
+                            $body
+                        );
+                        $params[$key] = '$' . $innerProvider->getShortName();
+                        break;
+                    case 'manytomany':
+                        $innerProvider = $this->getInnerProvider($entity);
+                        $body = $this->appendOnce(
+                            $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn),
+                            $body
+                        );
+                        $params[$key] = '[$' . $innerProvider->getShortName() . ']';
+                        break;
+                    case 'onetoone':
+                        $innerProvider = $this->entityProviderFactory->create($entity);
+                        $body .= $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn);
+                        $params[$key] = '$' . $innerProvider->getShortName();
+                        break;
+                }
+            } else {
+                $params[$key] = new ProviderValuePromise($provider, $key);
             }
         }
 
