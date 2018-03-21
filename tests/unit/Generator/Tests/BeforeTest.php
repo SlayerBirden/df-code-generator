@@ -130,7 +130,7 @@ class BeforeTest extends TestCase
         };
     }
 
-    public function testBefore()
+    public function testManyToOne()
     {
         $expected = <<<'BODY'
 $I->haveInRepository('Dummy\Group', array (
@@ -164,7 +164,7 @@ BODY;
         $this->assertEquals($expected, $actual);
     }
 
-    public function testBeforeManyToOne()
+    public function testManyToOneMultiple()
     {
         $provider = $this->getUserProvider(2, [
             [
@@ -250,7 +250,7 @@ BODY;
         $this->assertEquals($expected, $actual);
     }
 
-    public function testBeforeManyToMany()
+    public function testManyToManyMultiple()
     {
         $spec = [
             [
@@ -357,6 +357,111 @@ $I->haveInRepository('Dummy\User', array (
   'name' => 'Joe',
   'email' => 'jdoe@example.com',
   'groups' => [$group],
+));
+
+BODY;
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testRelationsNullable()
+    {
+        $spec = [
+            [
+                'name' => 'id',
+                'type' => 'integer',
+                'nullable' => false,
+            ],
+            [
+                'name' => 'name',
+                'type' => 'string',
+                'nullable' => false,
+            ],
+            [
+                'name' => 'email',
+                'type' => 'string',
+                'nullable' => false,
+            ],
+            [
+                'name' => 'group',
+                'type' => 'manytoone',
+                'entity' => 'Dummy\\Group',
+                'nullable' => true,
+            ],
+        ];
+        $provider1 = $this->providers[0];
+        $provider1->getEntitySpec()->willReturn($spec);
+
+        $actual = (new class('Dummy\\User', $this->getFactory(), .0) extends AbstractTest
+        {
+
+            public function generate(): string
+            {
+                return $this->generateHaveInRepo();
+            }
+
+            public function getClassName(): string
+            {
+                return 'TestCest';
+            }
+        })->generate();
+
+        $expected = <<<'BODY'
+$I->haveInRepository('Dummy\User', array (
+  'id' => 1,
+  'name' => 'Bob',
+  'email' => 'bob@example.com',
+));
+
+BODY;
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testNullableColumn()
+    {
+        $spec = [
+            [
+                'name' => 'id',
+                'type' => 'integer',
+                'nullable' => false,
+            ],
+            [
+                'name' => 'name',
+                'type' => 'string',
+                'nullable' => true,
+            ],
+            [
+                'name' => 'email',
+                'type' => 'string',
+                'nullable' => false,
+            ],
+            [
+                'name' => 'group',
+                'type' => 'manytoone',
+                'entity' => 'Dummy\\Group',
+                'nullable' => true,
+            ],
+        ];
+        $provider1 = $this->providers[0];
+        $provider1->getEntitySpec()->willReturn($spec);
+
+        $actual = (new class('Dummy\\User', $this->getFactory(), .0) extends AbstractTest
+        {
+
+            public function generate(): string
+            {
+                return $this->generateHaveInRepo();
+            }
+
+            public function getClassName(): string
+            {
+                return 'TestCest';
+            }
+        })->generate();
+
+        $expected = <<<'BODY'
+$I->haveInRepository('Dummy\User', array (
+  'id' => 1,
+  'email' => 'bob@example.com',
 ));
 
 BODY;

@@ -21,13 +21,20 @@ abstract class AbstractTest implements GeneratorInterface
     protected $providers = [];
     private $innerProviders = [];
     private $appended = [];
+    /**
+     * The default probability of Nulled values being filled with data
+     * @var float
+     */
+    private $probabilityOfFilledNullable;
 
     public function __construct(
         string $entityClassName,
-        EntityProviderFactoryInterface $entityProviderFactory
+        EntityProviderFactoryInterface $entityProviderFactory,
+        float $probabilityOfFilledNullable = .5
     ) {
         $this->entityProviderFactory = $entityProviderFactory;
         $this->entityClassName = $entityClassName;
+        $this->probabilityOfFilledNullable = $probabilityOfFilledNullable;
     }
 
     protected function getLatestProvider()
@@ -79,11 +86,17 @@ abstract class AbstractTest implements GeneratorInterface
             $key = $item['name'];
             $type = $item['type'];
             $entity = $item['entity'] ?? '';
+            $nullable = $item['nullable'] ?? false;
+            $referenceColumn = $item['ref_column_key'] ?? 'id';
+            // Skip 50% of nullable values (by default)
+            if ($nullable && rand(0,100)/100 > $this->probabilityOfFilledNullable) {
+                continue;
+            }
             switch ($type) {
                 case 'manytoone':
                     $innerProvider = $this->getInnerProvider($entity);
                     $body = $this->appendOnce(
-                        $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider),
+                        $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn),
                         $body
                     );
                     $params[$key] = '$' . $innerProvider->getShortName();
@@ -91,14 +104,14 @@ abstract class AbstractTest implements GeneratorInterface
                 case 'manytomany':
                     $innerProvider = $this->getInnerProvider($entity);
                     $body = $this->appendOnce(
-                        $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider),
+                        $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn),
                         $body
                     );
                     $params[$key] = '[$' . $innerProvider->getShortName() . ']';
                     break;
                 case 'onetoone':
                     $innerProvider = $this->entityProviderFactory->create($entity);
-                    $body .= $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider);
+                    $body .= $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn);
                     $params[$key] = '$' . $innerProvider->getShortName();
                     break;
                 default:
@@ -139,9 +152,9 @@ abstract class AbstractTest implements GeneratorInterface
         throw new \InvalidArgumentException('Wrong id provided.');
     }
 
-    protected function getUsagePhrase(EntityProviderInterface $provider): string
+    protected function getUsagePhrase(EntityProviderInterface $provider, string $referenceColumn): string
     {
-        $body = '$%s = $I->grabEntityFromRepository(%s, [\'id\' => %d]);';
+        $body = '$%s = $I->grabEntityFromRepository(%s, [\'' . $referenceColumn . '\' => %d]);';
 
         $args = [
             $provider->getShortName(),

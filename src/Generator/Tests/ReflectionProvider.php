@@ -7,6 +7,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -78,6 +79,13 @@ class ReflectionProvider implements EntityProviderInterface
                         $ref = new ClassReflection($annotation);
                         $columnType = strtolower($ref->getShortName());
                         $target = $annotation->targetEntity;
+                        /** @var JoinColumn $joinColumn */
+                        $joinColumn = (new AnnotationReader())
+                            ->getPropertyAnnotation($property, JoinColumn::class);
+                        if ($joinColumn) {
+                            $nullable = $joinColumn->nullable;
+                            $referenceColumn = $joinColumn->referencedColumnName;
+                        }
                         break;
                     }
                 }
@@ -93,6 +101,8 @@ class ReflectionProvider implements EntityProviderInterface
                     'name' => $property->getName(),
                     'type' => $columnType,
                     'entity' => $target ?? null,
+                    'nullable' => $nullable ?? false,
+                    'ref_column_key' => $referenceColumn ?? 'id',
                 ];
             }
         }
