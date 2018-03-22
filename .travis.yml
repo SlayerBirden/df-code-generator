@@ -6,16 +6,9 @@ php:
 
 install: composer install --no-interaction
 
-env:
-  global:
-  - TMPDIR=$TRAVIS_BUILD_DIR/tmp
-
 cache:
   directories:
     - "$HOME/.composer/cache"
-
-before_script:
-- mkdir -p $TRAVIS_BUILD_DIR/tmp
 
 script:
   - vendor/bin/phpunit --coverage-clover ./coverage.clover
