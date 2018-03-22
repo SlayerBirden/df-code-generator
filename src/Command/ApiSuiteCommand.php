@@ -23,8 +23,12 @@ use SlayerBirden\DFCodeGeneration\Generator\Tests\IdRegistry;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\ReflectionProviderFactory;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Update as TestUpdate;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\SimpleProvider;
+use SlayerBirden\DFCodeGeneration\Writer\OutputWriter;
+use SlayerBirden\DFCodeGeneration\Writer\StandardFileNameProvider;
+use SlayerBirden\DFCodeGeneration\Writer\WriteInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -49,6 +53,16 @@ class ApiSuiteCommand extends Command
      * @var bool
      */
     private $tests;
+    /**
+     * @var null|WriteInterface
+     */
+    private $writer;
+
+    public function __construct(?string $name = null, ?WriteInterface $writer = null)
+    {
+        parent::__construct($name);
+        $this->writer = $writer;
+    }
 
     protected function configure()
     {
@@ -66,6 +80,10 @@ class ApiSuiteCommand extends Command
         $this->entityClassName = $input->getArgument('entity');
         $this->force = $input->getOption('force');
         $this->tests = $input->getOption('tests');
+        // If it's not force mode we're using output writer
+        if (!$this->force) {
+            $this->writer = new OutputWriter($this->output, new StandardFileNameProvider());
+        }
 
         AnnotationRegistry::registerLoader('class_exists');
     }
@@ -87,33 +105,36 @@ class ApiSuiteCommand extends Command
         if ($this->tests) {
             $this->generateTests();
         }
+
+        $output->writeln([
+            '<error>IMPORTANT: please check all generated files before committing.</error>',
+            '<error># You might want to run something like "php-cs-fixer" to make sure formatting is correct.</error>',
+        ]);
     }
 
     private function generateTests(): void
     {
         $entityProviderFactory = new ReflectionProviderFactory(new IdRegistry());
 
-        $addBody = (new TestAdd($this->entityClassName, $entityProviderFactory))->generate();
-        $deleteBody = (new TestDelete($this->entityClassName, $entityProviderFactory))->generate();
-        $getBody = (new TestGet($this->entityClassName, $entityProviderFactory))->generate();
-        $getsBody = (new TestGets($this->entityClassName, $entityProviderFactory))->generate();
-        $updateBody = (new TestUpdate($this->entityClassName, $entityProviderFactory))->generate();
-        if (!$this->force) {
-            $this->output->write($addBody);
-            $this->output->write($deleteBody);
-            $this->output->write($getBody);
-            $this->output->write($getsBody);
-            $this->output->write($updateBody);
-        }
+        $files = [];
+        $files[] = (new TestAdd($this->entityClassName, $entityProviderFactory))->generate();
+        $files[] = (new TestDelete($this->entityClassName, $entityProviderFactory))->generate();
+        $files[] = (new TestGet($this->entityClassName, $entityProviderFactory))->generate();
+        $files[] = (new TestGets($this->entityClassName, $entityProviderFactory))->generate();
+        $files[] = (new TestUpdate($this->entityClassName, $entityProviderFactory))->generate();
+
+        array_walk($files, [$this->getWriter(), 'write']);
+
+        $this->output->writeln('<info>Acceptance tests generated</info>');
     }
 
     private function generateConfig(): void
     {
-        $configBody = (new Config(new StandardProvider($this->entityClassName)))->generate();
+        $this->getWriter()->write(
+            (new Config(new StandardProvider($this->entityClassName)))->generate()
+        );
 
-        if (!$this->force) {
-            $this->output->write($configBody);
-        }
+        $this->output->writeln('<info>Config generated</info>');
     }
 
     /**
@@ -123,11 +144,11 @@ class ApiSuiteCommand extends Command
      */
     private function generateRoutes(): void
     {
-        $routesBody = (new Routes(new SimpleProvider($this->entityClassName)))->generate();
+        $this->getWriter()->write(
+            (new Routes(new SimpleProvider($this->entityClassName)))->generate()
+        );
 
-        if (!$this->force) {
-            $this->output->write($routesBody);
-        }
+        $this->output->writeln('<info>Routes provider generated</info>');
     }
 
     /**
@@ -137,17 +158,18 @@ class ApiSuiteCommand extends Command
      */
     private function generateControllerStack(): void
     {
-        $addBody = (new Add(
+        $files = [];
+        $files[] = (new Add(
             new DecoratedProvider(
                 $this->entityClassName,
                 new UniqueProviderDecorator($this->entityClassName),
                 new RelationsProviderDecorator($this->entityClassName)
             )
         ))->generate();
-        $deleteBody = (new Delete(new ControllerSimpleProvider($this->entityClassName)))->generate();
-        $getBody = (new Get(new ControllerSimpleProvider($this->entityClassName)))->generate();
-        $getsBody = (new Gets(new ControllerSimpleProvider($this->entityClassName)))->generate();
-        $updateBody = (new Update(
+        $files[] = (new Delete(new ControllerSimpleProvider($this->entityClassName)))->generate();
+        $files[] = (new Get(new ControllerSimpleProvider($this->entityClassName)))->generate();
+        $files[] = (new Gets(new ControllerSimpleProvider($this->entityClassName)))->generate();
+        $files[] = (new Update(
             new DecoratedProvider(
                 $this->entityClassName,
                 new UniqueProviderDecorator($this->entityClassName),
@@ -155,12 +177,19 @@ class ApiSuiteCommand extends Command
             )
         ))->generate();
 
-        if (!$this->force) {
-            $this->output->write($addBody);
-            $this->output->write($deleteBody);
-            $this->output->write($getBody);
-            $this->output->write($getsBody);
-            $this->output->write($updateBody);
+        array_walk($files, [$this->getWriter(), 'write']);
+
+        $this->output->writeln('<info>Controller stack generated</info>');
+    }
+
+    /**
+     * @return WriteInterface
+     */
+    private function getWriter(): WriteInterface
+    {
+        if ($this->writer === null) {
+            throw new LogicException('Writer is not defined!');
         }
+        return $this->writer;
     }
 }

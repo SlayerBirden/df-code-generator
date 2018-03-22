@@ -6,9 +6,12 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Tests;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use SlayerBirden\DFCodeGeneration\CodeLoader;
+use SlayerBirden\DFCodeGeneration\PrintFileTrait;
 
 class DeleteTest extends TestCase
 {
+    use PrintFileTrait;
+
     private $provider;
     private $factory;
 
@@ -60,6 +63,11 @@ class DeleteTest extends TestCase
         $this->assertNotEmpty($code);
 
         // asserting php code is valid and can be loaded
-        CodeLoader::loadCode($code, 'DeleteCest.php');
+        try {
+            CodeLoader::loadCode($code, 'DeleteCest.php');
+        } catch (\Throwable $exception) {
+            echo 'File', PHP_EOL, $this->getPrintableFile($code), PHP_EOL;
+            throw $exception;
+        }
     }
 }
