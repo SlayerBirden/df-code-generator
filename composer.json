@@ -21,8 +21,7 @@
     "require": {
         "symfony/console": "^4.1@dev",
         "twig/twig": "2.x-dev",
-        "doctrine/annotations": "^1.7@dev",
-        "doctrine/orm": "2.7.x-dev",
+        "doctrine/orm": "^2.6",
         "zendframework/zend-code": "^3.2@dev",
         "fzaninotto/faker": "^1.8@dev"
     },
@@ -30,10 +29,10 @@
         "phpunit/phpunit": "^7.1@dev",
         "mikey179/vfsStream": "^2.0@dev",
         "zendframework/zend-expressive": "^2.2",
-        "zendframework/zend-servicemanager": "^3.3@dev",
+        "zendframework/zend-servicemanager": "^3.3",
         "zendframework/zend-expressive-helpers": "^4.2",
-        "zendframework/zend-hydrator": "^2.3@dev",
-        "psr/log": "^1.0@dev",
-        "zendframework/zend-inputfilter": "^2.8@dev"
+        "zendframework/zend-hydrator": "^2.3",
+        "psr/log": "^1.0",
+        "zendframework/zend-inputfilter": "^2.8"
     }
 }
