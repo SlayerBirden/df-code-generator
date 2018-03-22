@@ -25,7 +25,7 @@ class {{ entityName }}RoutesDelegator
         ], 'get_{{ entityName|lower }}');
 
         $app->get('/{{ entityName|lower }}s', [
-            Controller\Get{{ entityName }}sAction::class
+            Controller\Get{{ pluralEntityName }}Action::class
         ], 'get_{{ entityName|lower }}s');
 
         $app->post('/{{ entityName|lower }}', [

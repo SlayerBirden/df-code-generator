@@ -5,6 +5,7 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Factory;
 
 use SlayerBirden\DFCodeGeneration\Generator\BaseNameTrait;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\SimpleProvider as ControllerDataProvider;
+use SlayerBirden\DFCodeGeneration\Util\Lexer;
 
 class SimpleProvider implements DataProviderInterface
 {
@@ -32,6 +33,7 @@ class SimpleProvider implements DataProviderInterface
             'ns' => $this->getNs(),
             'controllerNs' => $controllerParams['ns'],
             'entityName' => $this->getBaseName(),
+            'pluralEntityName' => Lexer::getPluralForm($this->getBaseName()),
         ];
     }
 

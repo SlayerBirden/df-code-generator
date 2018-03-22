@@ -6,7 +6,7 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Factory;
 use Interop\Container\ContainerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
-use SlayerBirden\DFCodeGeneration\CodeLoader;
+use SlayerBirden\DFCodeGeneration\Util\CodeLoader;
 use SlayerBirden\DFCodeGeneration\PrintFileTrait;
 use Zend\Expressive\Application;
 use Zend\Expressive\Router\RouterInterface;
@@ -32,6 +32,7 @@ class RoutesTest extends TestCase
             'ns' => 'Dummy\\Factory',
             'controllerNs' => 'Dummy\\Controller',
             'entityName' => 'Dummy',
+            'pluralEntityName' => 'Dummies',
         ]);
         $this->provider->getClassName()->willReturn('Dummy\\Factory\\DummyRoutesDelegator');
 
@@ -91,7 +92,7 @@ CONTROLLER;
 
         $actions = [
             'GetDummyAction',
-            'GetDummysAction',
+            'GetDummiesAction',
             'AddDummyAction',
             'DeleteDummyAction',
             'UpdateDummyAction'

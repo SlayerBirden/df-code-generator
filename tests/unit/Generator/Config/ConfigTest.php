@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use SlayerBirden\DFCodeGeneration\CodeLoader;
+use SlayerBirden\DFCodeGeneration\Util\CodeLoader;
 use SlayerBirden\DFCodeGeneration\PrintFileTrait;
 
 class GetTest extends TestCase

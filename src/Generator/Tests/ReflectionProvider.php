@@ -195,6 +195,9 @@ class ReflectionProvider implements EntityProviderInterface
                     break;
                 }
             }
+            if ($this->hasUnique === null) {
+                $this->hasUnique = false;
+            }
         }
 
         return $this->hasUnique;

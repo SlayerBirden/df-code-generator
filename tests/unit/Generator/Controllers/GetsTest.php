@@ -12,7 +12,7 @@ use Prophecy\Prophecy\MethodProphecy;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use SlayerBirden\DFCodeGeneration\CodeLoader;
+use SlayerBirden\DFCodeGeneration\Util\CodeLoader;
 use SlayerBirden\DFCodeGeneration\PrintFileTrait;
 use Zend\Diactoros\ServerRequest;
 use Zend\Expressive\Handler\NotFoundHandler;
@@ -32,6 +32,7 @@ class GetsTest extends TestCase
         $this->provider->provide()->willReturn([
             'ns' => 'Dummy\\Controller',
             'entityName' => 'User',
+            'pluralEntityName' => 'Users',
             'hasUnique' => false,
             'uniqueIdxMessage' => 'Test Constraint violation',
             'useStatement' => 'Dummy\\Entities\\User',

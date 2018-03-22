@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SlayerBirden\DFCodeGeneration\Generator\Tests;
 
 use Faker\Factory;
+use SlayerBirden\DFCodeGeneration\Util\Lexer;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 use Zend\Code\Generator\MethodGenerator;
@@ -271,6 +272,6 @@ BODY;
 
     public function getClassName(): string
     {
-        return 'Get' . $this->getLatestProvider()->getBaseName() . 'sCest';
+        return 'Get' . Lexer::getPluralForm($this->getLatestProvider()->getBaseName()) . 'Cest';
     }
 }

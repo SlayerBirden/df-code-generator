@@ -9,7 +9,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use SlayerBirden\DFCodeGeneration\CodeLoader;
+use SlayerBirden\DFCodeGeneration\Util\CodeLoader;
 use SlayerBirden\DFCodeGeneration\PrintFileTrait;
 use Zend\Diactoros\ServerRequest;
 use Zend\Expressive\Handler\NotFoundHandler;

@@ -25,6 +25,7 @@ class ProviderTest extends TestCase
             'ns' => 'SlayerBirden\\DFCodeGeneration\\Catalog\\Factory',
             'controllerNs' => 'SlayerBirden\\DFCodeGeneration\\Catalog\\Controller',
             'entityName' => 'Product',
+            'pluralEntityName' => 'Products',
         ];
 
         $this->assertEquals(

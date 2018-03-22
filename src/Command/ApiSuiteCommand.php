@@ -9,6 +9,7 @@ use SlayerBirden\DFCodeGeneration\Generator\Config\StandardProvider;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Add;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\DecoratedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Delete;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\EntityNamePluralDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Get;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Gets;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\RelationsProviderDecorator;
@@ -24,7 +25,7 @@ use SlayerBirden\DFCodeGeneration\Generator\Tests\ReflectionProviderFactory;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Update as TestUpdate;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\SimpleProvider;
 use SlayerBirden\DFCodeGeneration\Writer\OutputWriter;
-use SlayerBirden\DFCodeGeneration\Writer\StandardFileNameProvider;
+use SlayerBirden\DFCodeGeneration\Writer\Psr4FileNameProvider;
 use SlayerBirden\DFCodeGeneration\Writer\WriteInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -82,7 +83,7 @@ class ApiSuiteCommand extends Command
         $this->tests = $input->getOption('tests');
         // If it's not force mode we're using output writer
         if (!$this->force) {
-            $this->writer = new OutputWriter($this->output, new StandardFileNameProvider());
+            $this->writer = new OutputWriter($this->output, new Psr4FileNameProvider());
         }
 
         AnnotationRegistry::registerLoader('class_exists');
@@ -123,7 +124,9 @@ class ApiSuiteCommand extends Command
         $files[] = (new TestGets($this->entityClassName, $entityProviderFactory))->generate();
         $files[] = (new TestUpdate($this->entityClassName, $entityProviderFactory))->generate();
 
-        array_walk($files, [$this->getWriter(), 'write']);
+        array_walk($files, function ($contents) {
+            $this->writer->write($contents);
+        });
 
         $this->output->writeln('<info>Acceptance tests generated</info>');
     }
@@ -168,7 +171,12 @@ class ApiSuiteCommand extends Command
         ))->generate();
         $files[] = (new Delete(new ControllerSimpleProvider($this->entityClassName)))->generate();
         $files[] = (new Get(new ControllerSimpleProvider($this->entityClassName)))->generate();
-        $files[] = (new Gets(new ControllerSimpleProvider($this->entityClassName)))->generate();
+        $files[] = (new Gets(
+            new DecoratedProvider(
+                $this->entityClassName,
+                new EntityNamePluralDecorator()
+            )
+        ))->generate();
         $files[] = (new Update(
             new DecoratedProvider(
                 $this->entityClassName,
@@ -177,7 +185,9 @@ class ApiSuiteCommand extends Command
             )
         ))->generate();
 
-        array_walk($files, [$this->getWriter(), 'write']);
+        array_walk($files, function ($contents) {
+            $this->writer->write($contents);
+        });
 
         $this->output->writeln('<info>Controller stack generated</info>');
     }

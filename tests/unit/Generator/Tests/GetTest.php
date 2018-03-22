@@ -5,7 +5,7 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use SlayerBirden\DFCodeGeneration\CodeLoader;
+use SlayerBirden\DFCodeGeneration\Util\CodeLoader;
 use SlayerBirden\DFCodeGeneration\PrintFileTrait;
 
 class GetTest extends TestCase

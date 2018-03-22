@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use SlayerBirden\DFCodeGeneration\Command\ApiSuiteCommand;
 use SlayerBirden\DFCodeGeneration\Writer\FileWriter;
-use SlayerBirden\DFCodeGeneration\Writer\StandardFileNameProvider;
+use SlayerBirden\DFCodeGeneration\Writer\Psr4FileNameProvider;
 use Symfony\Component\Console\Application;
 
 $autoloadPaths = [
@@ -23,7 +23,7 @@ foreach ($autoloadPaths as $path) {
 
 $app = new Application();
 
-$writer = new FileWriter($baseDir, new StandardFileNameProvider());
+$writer = new FileWriter($baseDir, new Psr4FileNameProvider());
 $app->add(new ApiSuiteCommand(null, $writer));
 
 $app->run();
