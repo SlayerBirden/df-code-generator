@@ -57,7 +57,7 @@ class AddTest extends TestCase
         $this->provider->hasUnique()->willReturn(true);
         $this->provider->getIdName()->willReturn('id');
 
-        $add = new Add('Dummy\\User', $this->factory->reveal());
+        $add = new Add('Dummy\\User', $this->factory->reveal(), new NullValuesRandomizer(.5));
 
         $code = $add->generate();
         $this->assertNotEmpty($code);

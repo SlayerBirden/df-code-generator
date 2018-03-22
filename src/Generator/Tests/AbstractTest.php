@@ -22,19 +22,18 @@ abstract class AbstractTest implements GeneratorInterface
     private $innerProviders = [];
     private $appended = [];
     /**
-     * The default probability of Nulled values being filled with data
-     * @var float
+     * @var NullValuesRandomizer
      */
-    private $probabilityOfFilledNullable;
+    private $nullValuesRandomizer;
 
     public function __construct(
         string $entityClassName,
         EntityProviderFactoryInterface $entityProviderFactory,
-        float $probabilityOfFilledNullable = .5
+        NullValuesRandomizer $nullValuesRandomizer
     ) {
         $this->entityProviderFactory = $entityProviderFactory;
         $this->entityClassName = $entityClassName;
-        $this->probabilityOfFilledNullable = $probabilityOfFilledNullable;
+        $this->nullValuesRandomizer = $nullValuesRandomizer;
     }
 
     protected function getLatestProvider()
@@ -87,8 +86,7 @@ abstract class AbstractTest implements GeneratorInterface
             $type = $item['type'];
             $reference = $item['reference'] ?? [];
             $nullable = $item['nullable'] ?? false;
-            // Skip 50% of nullable values (by default)
-            if ($nullable && rand(0,100)/100 > $this->probabilityOfFilledNullable) {
+            if ($nullable && !$this->nullValuesRandomizer->ifShouldWrite()) {
                 continue;
             }
             if ($reference) {

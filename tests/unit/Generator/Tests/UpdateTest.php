@@ -60,7 +60,7 @@ class UpdateTest extends TestCase
         $this->provider->hasUnique()->willReturn(true);
         $this->provider->getIdName()->willReturn('id');
 
-        $update = new Update('Dummy\\User', $this->factory->reveal());
+        $update = new Update('Dummy\\User', $this->factory->reveal(), new NullValuesRandomizer(.5));
 
         $code = $update->generate();
         $this->assertNotEmpty($code);

@@ -21,6 +21,7 @@ use SlayerBirden\DFCodeGeneration\Generator\Tests\Delete as TestDelete;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Get as TestGet;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Gets as TestGets;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\IdRegistry;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\NullValuesRandomizer;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\ReflectionProviderFactory;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Update as TestUpdate;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\SimpleProvider;
@@ -116,13 +117,15 @@ class ApiSuiteCommand extends Command
     private function generateTests(): void
     {
         $entityProviderFactory = new ReflectionProviderFactory(new IdRegistry());
+        // 50% null values written by default
+        $randomizer = new NullValuesRandomizer(.5);
 
         $files = [];
-        $files[] = (new TestAdd($this->entityClassName, $entityProviderFactory))->generate();
-        $files[] = (new TestDelete($this->entityClassName, $entityProviderFactory))->generate();
-        $files[] = (new TestGet($this->entityClassName, $entityProviderFactory))->generate();
-        $files[] = (new TestGets($this->entityClassName, $entityProviderFactory))->generate();
-        $files[] = (new TestUpdate($this->entityClassName, $entityProviderFactory))->generate();
+        $files[] = (new TestAdd($this->entityClassName, $entityProviderFactory, $randomizer))->generate();
+        $files[] = (new TestDelete($this->entityClassName, $entityProviderFactory, $randomizer))->generate();
+        $files[] = (new TestGet($this->entityClassName, $entityProviderFactory, $randomizer))->generate();
+        $files[] = (new TestGets($this->entityClassName, $entityProviderFactory, $randomizer))->generate();
+        $files[] = (new TestUpdate($this->entityClassName, $entityProviderFactory, $randomizer))->generate();
 
         array_walk($files, function ($contents) {
             $this->writer->write($contents);

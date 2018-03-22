@@ -57,7 +57,7 @@ class DeleteTest extends TestCase
         $this->provider->hasUnique()->willReturn(true);
         $this->provider->getIdName()->willReturn('id');
 
-        $delete = new Delete('Dummy\\User', $this->factory->reveal());
+        $delete = new Delete('Dummy\\User', $this->factory->reveal(), new NullValuesRandomizer(.5));
 
         $code = $delete->generate();
         $this->assertNotEmpty($code);

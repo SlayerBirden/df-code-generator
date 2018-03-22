@@ -149,9 +149,8 @@ $I->haveInRepository('Dummy\User', array (
 
 BODY;
 
-        $actual = (new class('Dummy\\User', $this->getFactory()) extends AbstractTest
+        $actual = (new class('Dummy\\User', $this->getFactory(), new NullValuesRandomizer(.5)) extends AbstractTest
         {
-
             public function generate(): string
             {
                 return $this->generateHaveInRepo();
@@ -224,7 +223,7 @@ $I->haveInRepository('Dummy\User', array (
 
 BODY;
 
-        $actual = (new class('Dummy\\User', $this->getFactory(), 2) extends AbstractTest
+        $actual = (new class('Dummy\\User', $this->getFactory(), new NullValuesRandomizer(.5), 2) extends AbstractTest
         {
             /**
              * @var int
@@ -234,9 +233,10 @@ BODY;
             public function __construct(
                 string $entityClassName,
                 EntityProviderFactoryInterface $entityProviderFactory,
+                NullValuesRandomizer $randomizer,
                 int $times
             ) {
-                parent::__construct($entityClassName, $entityProviderFactory);
+                parent::__construct($entityClassName, $entityProviderFactory, $randomizer);
                 $this->times = $times;
             }
 
@@ -319,7 +319,7 @@ BODY;
         ]);
         $this->providers[] = $provider4;
 
-        $actual = (new class('Dummy\\User', $this->getFactory(), 2) extends AbstractTest
+        $actual = (new class('Dummy\\User', $this->getFactory(), new NullValuesRandomizer(.5), 2) extends AbstractTest
         {
             /**
              * @var int
@@ -329,9 +329,10 @@ BODY;
             public function __construct(
                 string $entityClassName,
                 EntityProviderFactoryInterface $entityProviderFactory,
+                NullValuesRandomizer $randomizer,
                 int $times
             ) {
-                parent::__construct($entityClassName, $entityProviderFactory);
+                parent::__construct($entityClassName, $entityProviderFactory, $randomizer);
                 $this->times = $times;
             }
 
@@ -399,7 +400,7 @@ BODY;
         $provider1 = $this->providers[0];
         $provider1->getEntitySpec()->willReturn($spec);
 
-        $actual = (new class('Dummy\\User', $this->getFactory(), .0) extends AbstractTest
+        $actual = (new class('Dummy\\User', $this->getFactory(), new NullValuesRandomizer(.0)) extends AbstractTest
         {
 
             public function generate(): string
@@ -454,7 +455,7 @@ BODY;
         $provider1 = $this->providers[0];
         $provider1->getEntitySpec()->willReturn($spec);
 
-        $actual = (new class('Dummy\\User', $this->getFactory(), .0) extends AbstractTest
+        $actual = (new class('Dummy\\User', $this->getFactory(), new NullValuesRandomizer(.0)) extends AbstractTest
         {
 
             public function generate(): string

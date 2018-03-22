@@ -57,7 +57,7 @@ class GetsTest extends TestCase
         $this->provider->hasUnique()->willReturn(true);
         $this->provider->getIdName()->willReturn('id');
 
-        $gets = new Gets('Dummy\\User', $this->factory->reveal());
+        $gets = new Gets('Dummy\\User', $this->factory->reveal(), new NullValuesRandomizer(.5));
         $code = $gets->generate();
         $this->assertNotEmpty($code);
 
