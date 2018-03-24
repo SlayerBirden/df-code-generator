@@ -16,7 +16,7 @@ class NullValuesRandomizerTest extends TestCase
     {
         $randomizer = new NullValuesRandomizer($percentage);
         $hits = 0;
-        $total = 1000000;
+        $total = 100000;
         for ($i = 0; $i < $total; ++$i) {
             $randomizer->ifShouldWrite() ? ++$hits : null;
         }
@@ -32,7 +32,7 @@ class NullValuesRandomizerTest extends TestCase
         $randomizer = new NullValuesRandomizer(.0);
 
         $hits = 0;
-        for ($i = 0; $i < 1000000; ++$i) {
+        for ($i = 0; $i < 100000; ++$i) {
             $randomizer->ifShouldWrite() ? ++$hits : null;
         }
 
