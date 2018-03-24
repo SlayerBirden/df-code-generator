@@ -103,6 +103,7 @@ abstract class AbstractTest implements GeneratorInterface
                         $params[$key] = '$' . $innerProvider->getShortName();
                         break;
                     case 'manytomany':
+                    case 'onetomany':
                         $innerProvider = $this->getInnerProvider($entity);
                         $body = $this->appendOnce(
                             $this->getHaveInRepoPhrase($innerProvider) . $this->getUsagePhrase($innerProvider, $referenceColumn),
