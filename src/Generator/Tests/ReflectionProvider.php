@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToOne;
 use SlayerBirden\DFCodeGeneration\Generator\BaseNameTrait;
+use SlayerBirden\DFCodeGeneration\Util\Entity;
 use Zend\Code\Reflection\ClassReflection;
 
 class ReflectionProvider implements EntityProviderInterface
@@ -50,6 +51,10 @@ class ReflectionProvider implements EntityProviderInterface
      * @var string|null
      */
     private $idName;
+    /**
+     * @var string|null
+     */
+    private $idType;
 
     public function __construct(
         string $entityClassName,
@@ -246,16 +251,21 @@ class ReflectionProvider implements EntityProviderInterface
     public function getIdName(): string
     {
         if ($this->idName === null) {
-            $reflectionClassName = new ClassReflection($this->entityClassName);
-            foreach ($reflectionClassName->getProperties() as $property) {
-                /** @var Id $id */
-                $id = (new AnnotationReader())
-                    ->getPropertyAnnotation($property, Id::class);
-                if (!empty($id)) {
-                    $this->idName = $property->getName();
-                    break;
-                }
-            }
+            $this->idName = Entity::getEntityIdName($this->entityClassName);
+        }
+
+        return $this->idName;
+    }
+
+    /**
+     * @return string
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
+    public function getIdType(): string
+    {
+        if ($this->idType === null) {
+            $this->idType = Entity::getEntityIdType($this->entityClassName);
         }
 
         return $this->idName;

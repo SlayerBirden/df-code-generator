@@ -54,4 +54,6 @@ interface EntityProviderInterface
     public function hasUnique(): bool;
 
     public function getIdName(): string;
+
+    public function getIdType(): string;
 }

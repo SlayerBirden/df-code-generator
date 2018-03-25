@@ -45,7 +45,7 @@ class Get{{ entityName }}Action implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $handler): ResponseInterface
     {
-        $id = $request->getAttribute('id');
+        ${{ idName }} = $request->getAttribute('{{ idName }}');
         $success = false;
         $msg = '';
         $status = 200;
@@ -53,7 +53,7 @@ class Get{{ entityName }}Action implements MiddlewareInterface
         try {
             $entity = $this->entityManager
                 ->getRepository({{ entityName }}::class)
-                ->find($id);
+                ->find(${{ idName }});
             if ($entity) {
                 $success = true;
             } else {

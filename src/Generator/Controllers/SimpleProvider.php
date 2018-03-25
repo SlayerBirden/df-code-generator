@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SlayerBirden\DFCodeGeneration\Generator\Controllers;
 
 use SlayerBirden\DFCodeGeneration\Generator\BaseNameTrait;
+use SlayerBirden\DFCodeGeneration\Util\Entity;
 
 class SimpleProvider implements DataProviderInterface
 {
@@ -22,6 +23,7 @@ class SimpleProvider implements DataProviderInterface
     /**
      * @return array
      * @throws \ReflectionException
+     * @throws \Doctrine\Common\Annotations\AnnotationException
      */
     public function provide(): array
     {
@@ -29,6 +31,7 @@ class SimpleProvider implements DataProviderInterface
             'ns' => $this->getNs(),
             'useStatement' => ltrim($this->entityClassName, '\\'),
             'entityName' => $this->getBaseName(),
+            'idName' => Entity::getEntityIdName($this->entityClassName),
         ];
     }
 

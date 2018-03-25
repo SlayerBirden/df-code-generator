@@ -30,6 +30,7 @@ class DeleteTest extends TestCase
             'ns' => 'Dummy\\Controller',
             'entityName' => 'User',
             'hasUnique' => false,
+            'idName' => 'id',
             'uniqueIdxMessage' => 'Test Constraint violation',
             'useStatement' => 'Dummy\\Entities\\User',
             'dataRelationship' => '// testing here',

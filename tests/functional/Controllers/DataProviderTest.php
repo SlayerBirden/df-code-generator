@@ -33,6 +33,7 @@ class DataProviderTest extends TestCase
             'useStatement' => Product::class,
             'entityName' => 'Product',
             'hasUnique' => true,
+            'idName' => 'id',
             'uniqueIdxMessage' => 'Provided sku already exists.',
             'dataRelationship' => '//TODO process data relationship'
         ];

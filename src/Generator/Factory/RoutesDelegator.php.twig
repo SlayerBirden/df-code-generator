@@ -20,7 +20,7 @@ class {{ entityName }}RoutesDelegator
         /** @var Application $app */
         $app = $callback();
 
-        $app->get('/{{ entityName|lower }}/{id:\d+}', [
+        $app->get('/{{ entityName|lower }}/{{ '{' }}{{ idName }}:{{ idRegexp }}{{ '}' }}', [
             Controller\Get{{ entityName }}Action::class
         ], 'get_{{ entityName|lower }}');
 
@@ -33,12 +33,12 @@ class {{ entityName }}RoutesDelegator
             Controller\Add{{ entityName }}Action::class
         ], 'add_{{ entityName|lower }}');
 
-        $app->put('/{{ entityName|lower }}/{id:\d+}', [
+        $app->put('/{{ entityName|lower }}/{{ '{' }}{{ idName }}:{{ idRegexp }}{{ '}' }}', [
             BodyParamsMiddleware::class,
             Controller\Update{{ entityName }}Action::class
         ], 'update_{{ entityName|lower }}');
 
-        $app->delete('/{{ entityName|lower }}/{id:\d+}', [
+        $app->delete('/{{ entityName|lower }}/{{ '{' }}{{ idName }}:{{ idRegexp }}{{ '}' }}', [
             Controller\Delete{{ entityName }}Action::class
         ], 'delete_{{ entityName|lower }}');
 

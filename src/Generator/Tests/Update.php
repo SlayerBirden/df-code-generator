@@ -60,7 +60,7 @@ class Update extends AbstractTest
         $body = <<<'BODY'
 $I->wantTo('update %1$s');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPUT('/%1$s/%2$d', %3$s);
+$I->sendPUT('/%1$s/%2$s', %3$s);
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
     'success' => true,
@@ -101,7 +101,7 @@ BODY;
         $body = <<<'BODY'
 $I->wantTo('update %1$s and attempt to set id');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPUT('/%1$s/%4$d', %2$s);
+$I->sendPUT('/%1$s/%4$s', %2$s);
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
     'success' => true,
@@ -116,10 +116,10 @@ BODY;
 
         $provider = $this->entityProviderFactory->create($this->entityClassName);
         $paramsWithId = $provider->getPostParams();
-        $paramsWithId['id'] = $last->getId();
+        $paramsWithId[$last->getIdName()] = $last->getId();
 
         $expected = $provider->getPostParams();
-        $expected['id'] = $first->getId();
+        $expected[$last->getIdName()] = $first->getId();
 
         return sprintf($body, $provider->getShortName(), var_export($paramsWithId, true), var_export($expected, true),
             $first->getId());
@@ -133,7 +133,7 @@ BODY;
             $body = <<<'BODY'
 $I->wantTo('update %1$s set invalid input');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPUT('/%1$s/%4$d', %2$s);
+$I->sendPUT('/%1$s/%4$s', %2$s);
 $I->seeResponseCodeIs(HttpCode::BAD_REQUEST);
 $I->seeResponseContainsJson([
     'success' => false,
@@ -169,7 +169,7 @@ BODY;
         $body = <<<'BODY'
 $I->wantTo('update %1$s, fail constraint');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPUT('/%1$s/%3$d', %2$s);
+$I->sendPUT('/%1$s/%3$s', %2$s);
 $I->seeResponseCodeIs(HttpCode::BAD_REQUEST);
 $I->seeResponseContainsJson([
     'success' => false,

@@ -64,7 +64,7 @@ class Update{{ entityName }}Action implements MiddlewareInterface
     public function process(ServerRequestInterface $request, DelegateInterface $handler): ResponseInterface
     {
         $data = $request->getParsedBody();
-        $id = (int)$request->getAttribute('id');
+        ${{ idName }} = (int)$request->getAttribute('{{ idName }}');
 
         $this->inputFilter->setData($data);
 
@@ -75,7 +75,7 @@ class Update{{ entityName }}Action implements MiddlewareInterface
 
         if ($this->inputFilter->isValid()) {
             try {
-                $entity = $this->getEntity($id, $data);
+                $entity = $this->getEntity(${{ idName }}, $data);
                 $this->entityManager->persist($entity);
                 $this->entityManager->flush();
                 $message = new SuccessMessage('{{ entityName }} has been updated!');
@@ -117,15 +117,15 @@ class Update{{ entityName }}Action implements MiddlewareInterface
         ], $status);
     }
 
-    private function getEntity(int $id, array $data): {{ entityName }}
+    private function getEntity(int ${{ idName }}, array $data): {{ entityName }}
     {
         /** @var {{ entityName }} $entity */
-        $entity = $this->entityManager->find({{ entityName }}::class, $id);
+        $entity = $this->entityManager->find({{ entityName }}::class, ${{ idName }});
         if (!$entity) {
-            throw new NonExistingEntity(sprintf('Could not find {{ entityName|lower }} by id %d.', $id));
+            throw new NonExistingEntity(sprintf('Could not find {{ entityName|lower }} by {{ idName }} %d.', ${{ idName }}));
         }
-        if (isset($data['id'])) {
-            unset($data['id']);
+        if (isset($data['{{ idName }}'])) {
+            unset($data['{{ idName }}']);
         }
         {{ dataRelationship|raw }}
         $this->hydrator->hydrate($data, $entity);

@@ -5,6 +5,7 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Factory;
 
 use SlayerBirden\DFCodeGeneration\Generator\BaseNameTrait;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\SimpleProvider as ControllerDataProvider;
+use SlayerBirden\DFCodeGeneration\Util\Entity;
 use SlayerBirden\DFCodeGeneration\Util\Lexer;
 
 class SimpleProvider implements DataProviderInterface
@@ -24,6 +25,7 @@ class SimpleProvider implements DataProviderInterface
     /**
      * @return array
      * @throws \ReflectionException
+     * @throws \Doctrine\Common\Annotations\AnnotationException
      */
     public function provide(): array
     {
@@ -34,6 +36,8 @@ class SimpleProvider implements DataProviderInterface
             'controllerNs' => $controllerParams['ns'],
             'entityName' => $this->getBaseName(),
             'pluralEntityName' => Lexer::getPluralForm($this->getBaseName()),
+            'idName' => Entity::getEntityIdName($this->entityClassName),
+            'idRegexp' => $this->getIdRegexp(Entity::getEntityIdType($this->entityClassName)),
         ];
     }
 
@@ -54,5 +58,15 @@ class SimpleProvider implements DataProviderInterface
     public function getClassName(): string
     {
         return $this->getNs() . '\\' . $this->getBaseName() . 'RoutesDelegator';
+    }
+
+    private function getIdRegexp(string $type): string
+    {
+        switch ($type) {
+            case 'integer':
+                return '\d+';
+            default:
+                return '\w+';
+        }
     }
 }

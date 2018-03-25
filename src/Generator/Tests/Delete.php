@@ -42,7 +42,7 @@ class Delete extends AbstractTest
         $body = <<<'BODY'
 $I->wantTo('delete %1$s');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendDELETE('/%1$s/%2$d');
+$I->sendDELETE('/%1$s/%2$s');
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
     'success' => true,

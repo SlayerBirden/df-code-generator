@@ -46,12 +46,12 @@ class Delete{{ entityName }}Action implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, DelegateInterface $handler): ResponseInterface
     {
-        $id = $request->getAttribute('id');
+        ${{ idName }} = $request->getAttribute('{{ idName }}');
         $deleted = false;
         $status = 200;
 
         try {
-            $entity = $this->entityManager->find({{ entityName }}::class, $id);
+            $entity = $this->entityManager->find({{ entityName }}::class, ${{ idName }});
             //todo check owner
             if ($entity) {
                 $this->entityManager->remove($entity);
