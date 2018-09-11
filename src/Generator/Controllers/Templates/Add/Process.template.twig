@@ -1,0 +1,26 @@
+$data = $request->getParsedBody();
+if (!is_array($data)) {
+    return (new DataValidationResponseFactory())('{{ refName }}');
+}
+$this->inputFilter->setData($data);
+
+if (!$this->inputFilter->isValid()) {
+    return (new ValidationResponseFactory())('{{ refName }}', $this->inputFilter);
+}
+try {
+    $entity = $this->getEntity($data);
+    $em = $this->managerRegistry->getManagerForClass({{ entityClassName }}::class);
+    $em->persist($entity);
+    $em->flush();
+    $msg = '{{ entityClassName }} has been successfully created!';
+    return (new GeneralSuccessResponseFactory())($msg, '{{ refName }}', $this->hydrator->extract($entity));
+} catch (ORMInvalidArgumentException $exception) {
+    return (new GeneralErrorResponseFactory())($exception->getMessage(), '{{ refName }}', 400);
+{% if hasUnique %}
+} catch (UniqueConstraintViolationException $exception) {
+    return (new GeneralErrorResponseFactory())('{{ uniqueIdxMessage }}', '{{ refName }}', 400);
+{% endif %}
+} catch (ORMException $exception) {
+    $this->logger->error((string)$exception);
+    return (new GeneralErrorResponseFactory())('Error during creation operation.', '{{ refName }}', 400);
+}

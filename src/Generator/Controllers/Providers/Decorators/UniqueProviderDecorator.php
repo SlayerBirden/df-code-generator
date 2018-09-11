@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Generator\Controllers;
+namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
 use Zend\Code\Reflection\ClassReflection;
 
 class UniqueProviderDecorator implements DataProviderDecoratorInterface
@@ -38,7 +39,7 @@ class UniqueProviderDecorator implements DataProviderDecoratorInterface
             $annotation = (new AnnotationReader())
                 ->getPropertyAnnotation($property, \Doctrine\ORM\Mapping\Column::class);
             if ($annotation && $annotation->unique) {
-                $this->uniqueFields[] = $property->getName();
+                $this->uniqueFields[$property->getName()] = $property->getName();
                 $this->hasUnique = true;
             }
         }

@@ -5,5 +5,5 @@ namespace SlayerBirden\DFCodeGeneration\Writer;
 
 interface WriteInterface
 {
-    public function write(string $content): void;
+    public function write(string $content, string $fileName): void;
 }

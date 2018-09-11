@@ -5,22 +5,23 @@ namespace {{ ns }};
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use {{ useStatement }};
-use SlayerBirden\DataFlowServer\Notification\DangerMessage;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Interop\Http\ServerMiddleware\DelegateInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use SlayerBirden\DataFlowServer\Authentication\Middleware\TokenMiddleware;
+use {{ useStatement }};
+use SlayerBirden\DataFlowServer\Notification\DangerMessage;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Hydrator\ExtractionInterface;
 
 class Get{{ pluralEntityName }}Action implements MiddlewareInterface
 {
     /**
-     * @var EntityManagerInterface
+     * @var EntityManager
      */
     private $entityManager;
     /**
@@ -33,7 +34,7 @@ class Get{{ pluralEntityName }}Action implements MiddlewareInterface
     private $extraction;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
+        EntityManager $entityManager,
         LoggerInterface $logger,
         ExtractionInterface $extraction
     ) {
@@ -45,18 +46,32 @@ class Get{{ pluralEntityName }}Action implements MiddlewareInterface
     /**
      * @inheritdoc
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $handler): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $data = $request->getQueryParams();
-        $page = isset($data['p']) ? abs($data['p']) : null;
+        $page = isset($data['p']) ? abs($data['p']) : 1;
+        $limit = isset($data['l']) ? abs($data['l']) : 10;
         $filters = $data['f'] ?? [];
         $sorting = $data['s'] ?? [];
-        $success = false;
-        $msg = '';
-        $status = 200;
+
+        {% if hasOwner %}
+        $currentOwner = $request->getAttribute(TokenMiddleware::USER_PARAM);
+
+        if (!$currentOwner) {
+            return new JsonResponse([
+                'data' => [
+                    '{{ pluralEntityName|lower }}' => [],
+                    'count' => 0,
+                ],
+                'msg' => new DangerMessage('Access denied. Only Logged In users can access this resource.'),
+                'success' => false
+            ], 403);
+        }
+        $filters['owner'] = $currentOwner;
+        {% endif %}
 
         try {
-            $criteria = $this->buildCriteria($filters, $sorting, $page);
+            $criteria = $this->buildCriteria($filters, $sorting, $page, $limit);
 
             /** @var Collection $entities */
             $entities = $this->entityManager
@@ -64,44 +79,61 @@ class Get{{ pluralEntityName }}Action implements MiddlewareInterface
                 ->matching($criteria);
             // before collection load to count all records without pagination
             $count = $entities->count();
-
             if ($count > 0) {
-                $arrayEntities = array_map(function ($entities) {
-                    return $this->extraction->extract($entities);
+                $arrayEntities = array_map(function ($entity) {
+                    return $this->extraction->extract($entity);
                 }, $entities->toArray());
-                $success = true;
+                return new JsonResponse([
+                    'data' => [
+                        '{{ pluralEntityName|lower }}' => $arrayEntities,
+                        'count' => $count,
+                    ],
+                    'success' => true,
+                    'msg' => null,
+                ], 200);
             } else {
-                $msg = new DangerMessage('Could not find {{ entityName|lower }}s using given conditions.');
-                $status = 404;
+                return new JsonResponse([
+                    'data' => [
+                        '{{ pluralEntityName|lower }}' => [],
+                        'count' => 0,
+                    ],
+                    'success' => false,
+                    'msg' => new DangerMessage('Could not find {{ pluralEntityName }} using given conditions.'),
+                ], 404);
             }
         } catch (ORMException $exception) {
             $this->logger->error((string)$exception);
-            $msg = new DangerMessage('Could not fetch {{ entityName|lower }}s.');
-            $status = 400;
+            return new JsonResponse([
+                'data' => [
+                    '{{ pluralEntityName|lower }}' => [],
+                    'count' => 0,
+                ],
+                'success' => false,
+                'msg' => new DangerMessage('Could not fetch {{ pluralEntityName }}.'),
+            ], 500);
         }
-
-        return new JsonResponse([
-            'data' => [
-                '{{ entityName|lower }}s' => $arrayEntities ?? [],
-                'count' => $count ?? 0,
-            ],
-            'success' => $success,
-            'msg' => $msg,
-        ], $status);
     }
 
-    private function buildCriteria(array $filters = [], array $sorting = [], ?int $page = null, int $limit = 10): Criteria
-    {
+    private function buildCriteria(
+        array $filters = [],
+        array $sorting = [],
+        int $page = 1,
+        int $limit = 10
+    ): Criteria {
         $criteria = Criteria::create();
-        if ($page !== null) {
-            $criteria->setFirstResult(($page - 1) * $limit)
-                ->setMaxResults($limit);
-        }
+        $criteria->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
         foreach ($filters as $key => $value) {
-            $criteria->andWhere(Criteria::expr()->contains($key, $value));
+            if (is_string($value)) {
+                $criteria->andWhere(Criteria::expr()->contains($key, $value));
+            } else {
+                $criteria->andWhere(Criteria::expr()->eq($key, $value));
+            }
         }
         if ($sorting) {
-            $criteria->orderBy($sorting);
+            foreach ($sorting as $key => $dir) {
+                $criteria->orderBy($sorting);
+            }
         }
 
         return $criteria;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration;
+namespace SlayerBirden\DFCodeGeneration\Generator\DataProvider;
 
 interface DataProviderInterface
 {

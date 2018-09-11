@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Util;
 
+use Zend\Code\Reflection\ClassReflection;
+use Zend\Filter\Word\CamelCaseToUnderscore;
+
 class Lexer
 {
     /**
@@ -47,5 +50,27 @@ class Lexer
         }
 
         return $name . 's';
+    }
+
+    /**
+     * @param string $fullyQualifiedName
+     * @return string
+     * @throws \ReflectionException
+     */
+    public static function getBaseName(string $fullyQualifiedName): string
+    {
+        $reflection = new ClassReflection($fullyQualifiedName);
+        return $reflection->getShortName();
+    }
+
+    /**
+     * @param string $fullyQualifiedName
+     * @return string
+     * @throws \ReflectionException
+     */
+    public static function getRefName(string $fullyQualifiedName): string
+    {
+        $baseName = self::getBaseName($fullyQualifiedName);
+        return strtolower((new CamelCaseToUnderscore())->filter($baseName));
     }
 }

@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Generator\Controllers;
+namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators;
 
+use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
 use SlayerBirden\DFCodeGeneration\Util\Lexer;
 
 class EntityNamePluralDecorator implements DataProviderDecoratorInterface

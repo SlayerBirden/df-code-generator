@@ -9,20 +9,15 @@ class FileWriter implements WriteInterface
      * @var string
      */
     private $baseDir;
-    /**
-     * @var FileNameProviderInterface
-     */
-    private $fileNameProvider;
 
-    public function __construct(string $baseDir, FileNameProviderInterface $fileNameProvider)
+    public function __construct(string $baseDir)
     {
         $this->baseDir = $baseDir;
-        $this->fileNameProvider = $fileNameProvider;
     }
 
-    public function write(string $content): void
+    public function write(string $content, string $fileName): void
     {
-        $fullName = rtrim($this->baseDir, '/') . '/' . $this->fileNameProvider->getFileName($content);
+        $fullName = rtrim($this->baseDir, '/') . '/' . $fileName;
 
         $dir = dirname($fullName);
 

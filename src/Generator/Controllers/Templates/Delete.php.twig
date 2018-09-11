@@ -7,10 +7,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Interop\Http\ServerMiddleware\DelegateInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
-use {{ useStatement }};
+use SlayerBirden\DataFlowServer\Doctrine\Middleware\ResourceMiddlewareInterface;
 use SlayerBirden\DataFlowServer\Notification\DangerMessage;
 use SlayerBirden\DataFlowServer\Notification\SuccessMessage;
 use Zend\Diactoros\Response\JsonResponse;
@@ -44,36 +44,29 @@ class Delete{{ entityName }}Action implements MiddlewareInterface
     /**
      * @inheritdoc
      */
-    public function process(ServerRequestInterface $request, DelegateInterface $handler): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        ${{ idName }} = $request->getAttribute('{{ idName }}');
-        $deleted = false;
-        $status = 200;
+        $entity = $request->getAttribute(ResourceMiddlewareInterface::DATA_RESOURCE);
 
         try {
-            $entity = $this->entityManager->find({{ entityName }}::class, ${{ idName }});
-            //todo check owner
-            if ($entity) {
-                $this->entityManager->remove($entity);
-                $this->entityManager->flush();
-                $msg = new SuccessMessage('{{ entityName }} removed.');
-                $deleted = true;
-            } else {
-                $msg = new DangerMessage('Could not find {{ entityName|lower}} to delete.');
-                $status = 404;
-            }
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
+            return new JsonResponse([
+                'msg' => new SuccessMessage('{{ entityName }} was deleted'),
+                'success' => true,
+                'data' => [
+                    '{{ entityName|lower}}' => $this->extraction->extract($entity),
+                ]
+            ], 200);
         } catch (ORMException $exception) {
             $this->logger->error((string)$exception);
-            $msg = new DangerMessage('There was an error while removing {{ entityName|lower}}.');
-            $status = 400;
+            return new JsonResponse([
+                'msg' => new DangerMessage('There was an error while removing {{ entityName|lower}}'),
+                'success' => false,
+                'data' => [
+                    '{{ entityName|lower}}' => null,
+                ]
+            ], 500);
         }
-
-        return new JsonResponse([
-            'msg' => $msg,
-            'success' => $deleted,
-            'data' => [
-                '{{ entityName|lower}}' => !empty($entity) ? $this->extraction->extract($entity) : null
-            ],
-        ], $status);
     }
 }

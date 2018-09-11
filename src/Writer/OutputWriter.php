@@ -11,26 +11,20 @@ class OutputWriter implements WriteInterface
      * @var OutputInterface
      */
     private $output;
-    /**
-     * @var FileNameProviderInterface
-     */
-    private $fileNameProvider;
 
-    public function __construct(OutputInterface $output, FileNameProviderInterface $fileNameProvider)
+    public function __construct(OutputInterface $output)
     {
         $this->output = $output;
-        $this->fileNameProvider = $fileNameProvider;
     }
 
-    public function write(string $content): void
+    public function write(string $content, string $fileName): void
     {
-        $fName = $this->fileNameProvider->getFileName($content);
         $this->output->writeln(
-            sprintf('<comment>START FILE %s==================================================</comment>', $fName)
+            sprintf('<comment>START FILE %s==================================================</comment>', $fileName)
         );
         $this->output->writeln($content);
         $this->output->writeln(
-            sprintf('<comment>END FILE %s####################################################</comment>', $fName)
+            sprintf('<comment>END FILE %s####################################################</comment>', $fileName)
         );
         $this->output->writeln("<comment>#\n#\n#\n#</comment>");
     }

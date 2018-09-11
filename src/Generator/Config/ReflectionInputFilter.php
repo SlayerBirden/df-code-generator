@@ -42,7 +42,6 @@ class ReflectionInputFilter
                 continue;
             }
             $inputFilter[$property->getName()] = [
-                'required' => !$annotation->nullable,
                 'filters' => [
                     [
                         'name' => 'stringtrim',

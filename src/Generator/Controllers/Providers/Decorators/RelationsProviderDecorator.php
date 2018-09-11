@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Generator\Controllers;
+namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToOne;
+use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
 use Zend\Code\Reflection\ClassReflection;
 
 class RelationsProviderDecorator implements DataProviderDecoratorInterface
@@ -27,6 +28,10 @@ class RelationsProviderDecorator implements DataProviderDecoratorInterface
         $this->entityClassName = $entityClassName;
     }
 
+    /**
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     private function prepareRelations(): void
     {
         $reflectionClassName = new ClassReflection($this->entityClassName);
@@ -42,6 +47,12 @@ class RelationsProviderDecorator implements DataProviderDecoratorInterface
         }
     }
 
+    /**
+     * @param array $data
+     * @return array
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     * @throws \ReflectionException
+     */
     public function decorate(array $data): array
     {
         $this->prepareRelations();

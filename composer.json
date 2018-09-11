@@ -17,23 +17,25 @@
             ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "symfony/console": "^4.0",
         "twig/twig": "^2.4",
+        "doctrine/annotations": "^1.5",
         "doctrine/orm": "^2.6",
         "zendframework/zend-code": "^3.2",
-        "fzaninotto/faker": "^1.8"
+        "fzaninotto/faker": "^1.8",
+        "nette/php-generator": "^3.2"
     },
     "bin": [
         "bin/df-generator"
     ],
     "require-dev": {
-        "phpunit/phpunit": "^7.1@dev",
+        "phpunit/phpunit": "^7.1",
         "mikey179/vfsStream": "^2.0@dev",
-        "zendframework/zend-expressive": "^2.2",
+        "zendframework/zend-expressive": "^3.0",
         "zendframework/zend-servicemanager": "^3.3",
-        "zendframework/zend-expressive-helpers": "^4.2",
+        "zendframework/zend-expressive-helpers": "^5.0",
         "zendframework/zend-hydrator": "^2.3",
         "psr/log": "^1.0",
         "zendframework/zend-inputfilter": "^2.8"
