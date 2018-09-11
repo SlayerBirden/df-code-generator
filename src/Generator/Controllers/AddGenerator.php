@@ -7,7 +7,6 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Parameter;
 use Nette\PhpGenerator\PhpFile;
-use Nette\PhpGenerator\PhpLiteral;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\PsrPrinter;
@@ -22,10 +21,16 @@ final class AddGenerator implements GeneratorInterface
      * @var DataProviderInterface
      */
     private $dataProvider;
+    /**
+     * @var Environment
+     */
+    private $twig;
 
     public function __construct(DataProviderInterface $dataProvider)
     {
         $this->dataProvider = $dataProvider;
+        $loader = new FilesystemLoader(__DIR__ . '/Templates');
+        $this->twig = new Environment($loader);
     }
 
     /**
@@ -36,10 +41,7 @@ final class AddGenerator implements GeneratorInterface
      */
     private function getProcessMethodBody(): string
     {
-        $loader = new FilesystemLoader(__DIR__ . '/Templates');
-        $twig = new Environment($loader);
-
-        return $twig->load('Add/Process.template.twig')->render($this->dataProvider->provide());
+        return $this->twig->load('Add/Process.template.twig')->render($this->dataProvider->provide());
     }
 
     /**
@@ -105,14 +107,10 @@ BODY
                         (new Parameter('data'))->setTypeHint('array'),
                     ])
                     ->setReturnType($fullEntityName)
-                    ->setBody(<<<'BODY'
-$entity = new ?();
-$this->hydrator->hydrate($data, $entity);
-
-return $entity;
-BODY
-                        , [new PhpLiteral($this->dataProvider->provide()['entityClassName'])]
-                    )->setVisibility(ClassType::VISIBILITY_PUBLIC),
+                    ->setBody(
+                        $this->twig->load('Add/GetEntity.template.twig')->render($this->dataProvider->provide())
+                    )
+                    ->setVisibility(ClassType::VISIBILITY_PUBLIC),
             ]);
 
         return (new PsrPrinter())->printFile($file);
@@ -142,7 +140,6 @@ BODY
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
     public function getClassName(): string
     {
@@ -151,7 +148,6 @@ BODY
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
     private function getShortClassName(): string
     {
@@ -160,7 +156,6 @@ BODY
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
     private function getFullClassName(): string
     {
@@ -184,7 +179,6 @@ BODY
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
     public function getFileName(): string
     {

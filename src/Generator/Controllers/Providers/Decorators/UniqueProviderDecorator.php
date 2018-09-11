@@ -7,7 +7,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
 use Zend\Code\Reflection\ClassReflection;
 
-class UniqueProviderDecorator implements DataProviderDecoratorInterface
+final class UniqueProviderDecorator implements DataProviderDecoratorInterface
 {
     /**
      * @var bool

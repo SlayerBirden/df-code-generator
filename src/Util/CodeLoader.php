@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Util;
 
-class CodeLoader
+final class CodeLoader
 {
     private static $declared = [];
 

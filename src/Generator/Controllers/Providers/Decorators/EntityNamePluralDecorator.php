@@ -6,7 +6,7 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorato
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
 use SlayerBirden\DFCodeGeneration\Util\Lexer;
 
-class EntityNamePluralDecorator implements DataProviderDecoratorInterface
+final class EntityNamePluralDecorator implements DataProviderDecoratorInterface
 {
     public function decorate(array $data): array
     {

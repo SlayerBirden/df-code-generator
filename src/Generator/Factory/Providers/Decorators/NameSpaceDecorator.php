@@ -5,7 +5,7 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators;
 
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
 
-class NameSpaceDecorator implements DataProviderDecoratorInterface
+final class NameSpaceDecorator implements DataProviderDecoratorInterface
 {
     /**
      * @var string

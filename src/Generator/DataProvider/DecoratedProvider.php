@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Generator\DataProvider;
 
-class DecoratedProvider implements DataProviderInterface
+final class DecoratedProvider implements DataProviderInterface
 {
     /**
      * @var DataProviderDecoratorInterface[]

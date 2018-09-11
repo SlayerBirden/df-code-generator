@@ -19,10 +19,7 @@ final class Entity implements ConfigPartInterface
     }
 
     /**
-     * Get config array for current part
-     *
-     * @param array $current
-     * @return array
+     * @inheritdoc
      */
     public function getConfig(array $current = []): array
     {
@@ -30,9 +27,7 @@ final class Entity implements ConfigPartInterface
     }
 
     /**
-     * Part Code
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getCode(): string
     {
@@ -40,9 +35,7 @@ final class Entity implements ConfigPartInterface
     }
 
     /**
-     * Method name that is used to get config
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getMethodName(): string
     {

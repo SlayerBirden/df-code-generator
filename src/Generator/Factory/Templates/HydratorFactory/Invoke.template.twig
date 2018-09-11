@@ -1,0 +1,13 @@
+$hydrator = new ClassMethods();
+{% for column, target in single_deps %}
+//TODO check internal strategy (may not be ClassMethods)
+$hydrator->addStrategy('{{ column }}', new NestedEntityStrategy(new ClassMethods()));
+{% endfor %}
+{% for column, target in multi_deps %}
+//TODO check that CollectionStrategy is needed
+$hydrator->addStrategy('{{ column }}', new CollectionStrategy(new ClassMethods(), {{ target }}::class));
+{% endfor %}
+
+//TODO add any custom strategies here if needed (like Obscured)
+
+return $hydrator;

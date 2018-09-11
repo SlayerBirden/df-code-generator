@@ -5,7 +5,7 @@ namespace SlayerBirden\DFCodeGeneration\Writer;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-class OutputWriter implements WriteInterface
+final class OutputWriter implements WriteInterface
 {
     /**
      * @var OutputInterface

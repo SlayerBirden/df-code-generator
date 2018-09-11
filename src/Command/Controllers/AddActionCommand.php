@@ -17,6 +17,7 @@ use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\Uni
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\BaseProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\CachedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DecoratedProvider;
+use SlayerBirden\DFCodeGeneration\Generator\Factory\HydratorFactoryGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators\HydratorDecorator as FactoryHydratorDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators\NameSpaceDecorator as FactoryNSDecorator;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,7 +57,6 @@ final class AddActionCommand extends AbstractApiCommand
                 )
             )
         );
-
         $this->writer->write($addGenerator->generate(), $addGenerator->getFileName());
 
         $configDataProvider = new CachedProvider(
@@ -78,10 +78,22 @@ final class AddActionCommand extends AbstractApiCommand
             new Parts\Add\Dependencies($configDataProvider),
             new Parts\Add\InputFilter(
                 new Parts\Add\InputFilter\Entity($configDataProvider)
+            ),
+            new Parts\Add\Routes($configDataProvider)
+        );
+        $this->writer->write($addConfigGenerator->generate(), $addConfigGenerator->getFileName());
+
+        $hydratorFactoryGenerator = new HydratorFactoryGenerator(
+            new CachedProvider(
+                new DecoratedProvider(
+                    $baseProvider,
+                    new RelationsProviderDecorator($this->entityClassName),
+                    new FactoryHydratorDecorator($this->entityClassName),
+                    new FactoryNSDecorator($this->entityClassName)
+                )
             )
         );
-
-        $this->writer->write($addConfigGenerator->generate(), $addConfigGenerator->getFileName());
+        $this->writer->write($hydratorFactoryGenerator->generate(), $hydratorFactoryGenerator->getFileName());
 
         parent::execute($input, $output);
     }

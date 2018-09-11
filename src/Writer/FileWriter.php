@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Writer;
 
-class FileWriter implements WriteInterface
+final class FileWriter implements WriteInterface
 {
     /**
      * @var string

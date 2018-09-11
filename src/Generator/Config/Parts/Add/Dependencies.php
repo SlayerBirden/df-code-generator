@@ -10,6 +10,7 @@ use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderInterface;
 final class Dependencies implements ConfigPartInterface
 {
     const PART_KEY = 'dependencies';
+
     /**
      * @var DataProviderInterface
      */
@@ -21,10 +22,7 @@ final class Dependencies implements ConfigPartInterface
     }
 
     /**
-     * Get config array for current part
-     *
-     * @param array $current
-     * @return array
+     * @inheritdoc
      */
     public function getConfig(array $current = []): array
     {

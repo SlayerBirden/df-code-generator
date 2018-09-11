@@ -6,18 +6,18 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorato
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
-use Zend\Code\Reflection\ClassReflection;
 
-class RelationsProviderDecorator implements DataProviderDecoratorInterface
+final class RelationsProviderDecorator implements DataProviderDecoratorInterface
 {
     private $relations = [
         ManyToOne::class,
         ManyToMany::class,
         OneToOne::class,
+        OneToMany::class,
     ];
-    private $hasRelations = false;
     /**
      * @var string
      */
@@ -29,22 +29,30 @@ class RelationsProviderDecorator implements DataProviderDecoratorInterface
     }
 
     /**
+     * @return array
      * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \ReflectionException
      */
-    private function prepareRelations(): void
+    private function getRelations(): array
     {
-        $reflectionClassName = new ClassReflection($this->entityClassName);
+        $fields = [];
+
+        $reflectionClassName = new \ReflectionClass($this->entityClassName);
         foreach ($reflectionClassName->getProperties() as $property) {
             foreach ($this->relations as $type) {
+                /** @var ManyToMany|ManyToOne|OneToMany|OneToOne $annotation */
                 $annotation = (new AnnotationReader())
                     ->getPropertyAnnotation($property, $type);
                 if ($annotation) {
-                    $this->hasRelations = true;
-                    break;
+                    $fields[$property->getName()] = [
+                        'type' => $type,
+                        'target' => $annotation->targetEntity,
+                    ];
                 }
             }
         }
+
+        return $fields;
     }
 
     /**
@@ -55,10 +63,19 @@ class RelationsProviderDecorator implements DataProviderDecoratorInterface
      */
     public function decorate(array $data): array
     {
-        $this->prepareRelations();
+        $data['relations'] = $this->getRelations();
+        $data['single_deps'] = [];
+        $data['multi_deps'] = [];
 
-        if ($this->hasRelations) {
-            $data['dataRelationship'] = '//TODO process data relationship';
+        // sort into brackets
+        foreach ($data['relations'] as $column => $columnData) {
+            $type = $columnData['type'];
+            $target = $columnData['target'];
+            if ($type === ManyToOne::class || $type === OneToOne::class) {
+                $data['single_deps'][$column] = $target;
+            } elseif ($type === ManyToMany::class || $type == OneToMany::class) {
+                $data['multi_deps'][$column] = $target;
+            }
         }
 
         return $data;

@@ -30,9 +30,7 @@ final class InputFilter implements ConfigPartInterface, ArrayConfigPartInterface
     }
 
     /**
-     * Part Code
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getCode(): string
     {

@@ -6,7 +6,7 @@ namespace SlayerBirden\DFCodeGeneration\Util;
 use Zend\Code\Reflection\ClassReflection;
 use Zend\Filter\Word\CamelCaseToUnderscore;
 
-class Lexer
+final class Lexer
 {
     /**
      * Convert plural into singular form

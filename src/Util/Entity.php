@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Id;
 use Zend\Code\Reflection\ClassReflection;
 
-class Entity
+final class Entity
 {
     /**
      * @param string $entity
