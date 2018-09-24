@@ -6,7 +6,6 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Config;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
-use Zend\Code\Reflection\ClassReflection;
 
 final class ReflectionInputFilter
 {
@@ -28,7 +27,7 @@ final class ReflectionInputFilter
     public function getSpec(): array
     {
         $inputFilter = [];
-        $reflectionClassName = new ClassReflection($this->entityClassName);
+        $reflectionClassName = new \ReflectionClass($this->entityClassName);
         foreach ($reflectionClassName->getProperties() as $property) {
             $generated = (new AnnotationReader())
                 ->getPropertyAnnotation($property, GeneratedValue::class);

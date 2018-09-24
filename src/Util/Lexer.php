@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Util;
 
-use Zend\Code\Reflection\ClassReflection;
 use Zend\Filter\Word\CamelCaseToUnderscore;
 
 final class Lexer
@@ -59,7 +58,7 @@ final class Lexer
      */
     public static function getBaseName(string $fullyQualifiedName): string
     {
-        $reflection = new ClassReflection($fullyQualifiedName);
+        $reflection = new \ReflectionClass($fullyQualifiedName);
         return $reflection->getShortName();
     }
 

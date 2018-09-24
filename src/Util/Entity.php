@@ -6,7 +6,6 @@ namespace SlayerBirden\DFCodeGeneration\Util;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Id;
-use Zend\Code\Reflection\ClassReflection;
 
 final class Entity
 {
@@ -19,7 +18,7 @@ final class Entity
     public static function getEntityIdName(string $entity): ?string
     {
         $name = '';
-        $reflectionClassName = new ClassReflection($entity);
+        $reflectionClassName = new \ReflectionClass($entity);
         foreach ($reflectionClassName->getProperties() as $property) {
             /** @var Id $id */
             $id = (new AnnotationReader())
@@ -42,7 +41,7 @@ final class Entity
     public static function getEntityIdType(string $entity): string
     {
         $type = '';
-        $reflectionClassName = new ClassReflection($entity);
+        $reflectionClassName = new \ReflectionClass($entity);
         foreach ($reflectionClassName->getProperties() as $property) {
             /** @var Id $id */
             $id = (new AnnotationReader())

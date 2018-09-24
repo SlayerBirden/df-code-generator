@@ -23,7 +23,6 @@
         "twig/twig": "^2.4",
         "doctrine/annotations": "^1.5",
         "doctrine/orm": "^2.6",
-        "zendframework/zend-code": "^3.2",
         "fzaninotto/faker": "^1.8",
         "nette/php-generator": "^3.2"
     },
@@ -38,6 +37,7 @@
         "zendframework/zend-expressive-helpers": "^5.0",
         "zendframework/zend-hydrator": "^2.3",
         "psr/log": "^1.0",
-        "zendframework/zend-inputfilter": "^2.8"
+        "zendframework/zend-inputfilter": "^2.8",
+        "zendframework/zend-diactoros": "^1.7"
     }
 }

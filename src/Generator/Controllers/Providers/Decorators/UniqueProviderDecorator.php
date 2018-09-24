@@ -5,7 +5,6 @@ namespace SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorato
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
-use Zend\Code\Reflection\ClassReflection;
 
 final class UniqueProviderDecorator implements DataProviderDecoratorInterface
 {
@@ -33,7 +32,7 @@ final class UniqueProviderDecorator implements DataProviderDecoratorInterface
      */
     private function prepareUnique(): void
     {
-        $reflectionClassName = new ClassReflection($this->entityClassName);
+        $reflectionClassName = new \ReflectionClass($this->entityClassName);
         foreach ($reflectionClassName->getProperties() as $property) {
             /** @var \Doctrine\ORM\Mapping\Column $annotation */
             $annotation = (new AnnotationReader())
