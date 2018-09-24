@@ -11,14 +11,11 @@ class FileTest extends TestCase
 {
     public function testWrite()
     {
-        $fileNameProvider = $this->prophesize(FileNameProviderInterface::class);
-        $fileNameProvider->getFileName(Argument::any())->willReturn('src/dummy.php');
-
         $root = vfsStream::setup();
 
-        $writer = new FileWriter($root->url(), $fileNameProvider->reveal());
+        $writer = new FileWriter($root->url());
 
-        $writer->write('hello');
+        $writer->write('hello', 'src/dummy.php');
 
         $fName = $root->url() . '/src/dummy.php';
         $this->assertFileExists($fName);

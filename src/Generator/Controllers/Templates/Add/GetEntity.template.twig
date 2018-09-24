@@ -2,7 +2,9 @@ $entity = new {{ entityClassName }}();
 $this->hydrator->hydrate($data, $entity);
 
 {% if relations %}
-//TODO add relations for {{ relations|join(', ') }}
+{% for relation in relations %}
+//TODO add relations for {{ relation.target }} which is {{ relation.type }}
+{% endfor %}
 {% endif %}
 
 return $entity;

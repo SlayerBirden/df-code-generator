@@ -8,7 +8,7 @@ use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderInterface;
 
 final class Routes implements ConfigPartInterface
 {
-    const PART_KEY = 'rotes';
+    const PART_KEY = 'routes';
     /**
      * @var DataProviderInterface
      */
@@ -22,9 +22,9 @@ final class Routes implements ConfigPartInterface
     /**
      * @inheritdoc
      */
-    public function getConfig(array $current = []): array
+    public function getConfig(): array
     {
-        return array_merge_recursive($current, [
+        return [
             [
                 'path' => '/config',
                 'middleware' => [
@@ -36,7 +36,7 @@ final class Routes implements ConfigPartInterface
                 'name' => 'add_config',
                 'allowed_methods' => ['POST'],
             ],
-        ]);
+        ];
     }
 
     /**
@@ -45,14 +45,6 @@ final class Routes implements ConfigPartInterface
     public function getCode(): string
     {
         return self::PART_KEY;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMethodName(): string
-    {
-        return 'getRoutesConfig';
     }
 
     private function getControllerFullName(): string

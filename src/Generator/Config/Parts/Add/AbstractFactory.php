@@ -25,17 +25,17 @@ final class AbstractFactory implements ConfigPartInterface
     /**
      * @inheritdoc
      */
-    public function getConfig(array $current = []): array
+    public function getConfig(): array
     {
         $name = '\\' . $this->getControllerNamespace() . '\Add' . $this->getEntityClassName() . 'Action::class';
-        return array_merge_recursive($current, [
+        return [
             $name => [
                 new PhpLiteral('\SlayerBirden\DataFlowServer\Doctrine\Persistence\EntityManagerRegistry::class'),
                 'DbConfigHydrator',
                 'ConfigInputFilter',
                 LoggerInterface::class,
             ]
-        ]);
+        ];
     }
 
     /**
@@ -44,14 +44,6 @@ final class AbstractFactory implements ConfigPartInterface
     public function getCode(): string
     {
         return self::PART_KEY;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMethodName(): string
-    {
-        return 'getAbstractFactoryConfig';
     }
 
     private function getEntityClassName(): string

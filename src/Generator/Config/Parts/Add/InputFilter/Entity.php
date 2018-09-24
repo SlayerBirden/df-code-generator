@@ -21,7 +21,7 @@ final class Entity implements ConfigPartInterface
     /**
      * @inheritdoc
      */
-    public function getConfig(array $current = []): array
+    public function getConfig(): array
     {
         return $this->dataProvider->provide()['input_filter_spec'];
     }
@@ -32,13 +32,5 @@ final class Entity implements ConfigPartInterface
     public function getCode(): string
     {
         return $this->dataProvider->provide()['input_filter_name'];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMethodName(): string
-    {
-        return 'get' . $this->getCode() . 'Spec';
     }
 }

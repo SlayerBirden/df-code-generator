@@ -20,9 +20,9 @@ final class Doctrine implements ConfigPartInterface
         $this->dataProvider = $dataProvider;
     }
 
-    public function getConfig(array $current = []): array
+    public function getConfig(): array
     {
-        $config = [
+        return [
             'entity_managers' => [
                 'default' => [
                     'paths' => [
@@ -31,8 +31,6 @@ final class Doctrine implements ConfigPartInterface
                 ],
             ],
         ];
-
-        return array_merge_recursive($current, $config);
     }
 
     /**
@@ -43,15 +41,5 @@ final class Doctrine implements ConfigPartInterface
     public function getCode(): string
     {
         return self::PART_KEY;
-    }
-
-    /**
-     * Method name that is used to get config
-     *
-     * @return string
-     */
-    public function getMethodName(): string
-    {
-        return 'getDoctrineConfig';
     }
 }

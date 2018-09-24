@@ -27,7 +27,7 @@ final class EntitiesSrcDecorator implements DataProviderDecoratorInterface
     private function getEntitiesSrc(): string
     {
         // expect to have 3d part as Module
-        $parts = explode('\\', $this->entityClassName);
+        $parts = explode('\\', ltrim($this->entityClassName, '\\'));
         if (isset($parts[2])) {
             return sprintf('src/%s/Entities', $parts[2]);
         }

@@ -9,10 +9,12 @@ use Nette\PhpGenerator\PhpLiteral;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
 use SlayerBirden\DFCodeGeneration\Code\Printer\NsArrayPrinter;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Code\CodeFeederInterface;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderInterface;
 use SlayerBirden\DFCodeGeneration\Generator\GeneratorInterface;
+use SlayerBirden\DFCodeGeneration\Util\ArrayUtils;
 
-class ConfigGenerator implements GeneratorInterface
+final class ConfigGenerator implements GeneratorInterface
 {
     /**
      * @var DataProviderInterface
@@ -26,11 +28,19 @@ class ConfigGenerator implements GeneratorInterface
      * @var array
      */
     private $currentConfig;
+    /**
+     * @var CodeFeederInterface
+     */
+    private $codeFeeder;
 
-    public function __construct(DataProviderInterface $dataProvider, ConfigPartInterface ...$parts)
-    {
+    public function __construct(
+        DataProviderInterface $dataProvider,
+        CodeFeederInterface $codeFeeder,
+        ConfigPartInterface ...$parts
+    ) {
         $this->dataProvider = $dataProvider;
         $this->parts = $parts;
+        $this->codeFeeder = $codeFeeder;
     }
 
     public function generate(): string
@@ -44,58 +54,15 @@ class ConfigGenerator implements GeneratorInterface
         $class = $namespace->addClass('ConfigProvider');
         $class->setFinal();
 
-        $this->traverseParts($this->parts, $invoke, $namespace, $class, $this->getCurrentConfig());
+        foreach ($this->parts as $configPart) {
+            $invoke[$configPart->getCode()] = $configPart->getConfig();
+        }
 
+        $invoke = ArrayUtils::merge($this->getCurrentConfig(), $invoke);
         $this->addUses($invoke, $namespace);
-        $invokeBody = 'return ' . (new NsArrayPrinter($namespace))->printArray($invoke, 1, '') . ";\n";
-
-        $class->addMethod('__invoke')
-            ->setVisibility(ClassType::VISIBILITY_PUBLIC)
-            ->setReturnType('array')
-            ->setBody($invokeBody);
+        $this->codeFeeder->feed($invoke, $class, $namespace);
 
         return (new PsrPrinter())->printFile($file);
-    }
-
-    /**
-     * Iterate config parts and add methods / append main __invoke array
-     *
-     * @param ConfigPartInterface[] $parts
-     * @param array $invoke
-     * @param PhpNamespace $namespace
-     * @param ClassType $class
-     * @param array $currentConfig
-     * @param int $indentLevel
-     */
-    public function traverseParts(
-        array $parts,
-        array &$invoke,
-        PhpNamespace $namespace,
-        ClassType $class,
-        array $currentConfig,
-        int $indentLevel = 1
-    ): void {
-        foreach ($parts as $part) {
-            if ($part instanceof ArrayConfigPartInterface) {
-                $localBody = [];
-                $localCode = $part->getCode();
-                $currentLocalConfig = $currentConfig[$localCode] ?? [];
-                $this->traverseParts($part->getParts(), $localBody, $namespace, $class, $currentLocalConfig);
-                $invoke[$localCode] = new PhpLiteral(
-                    (new NsArrayPrinter($namespace))->printArray($localBody, $indentLevel + 1, "", null, false)
-                );
-            } else {
-                $code = $part->getCode();
-                $partConfig = $part->getConfig($currentConfig[$code] ?? []);
-                $invoke[$code] = new PhpLiteral(sprintf('$this->%s()', $part->getMethodName()));
-                $this->addUses($partConfig, $namespace);
-                $class->addMethod($part->getMethodName())
-                    ->setVisibility(ClassType::VISIBILITY_PUBLIC)
-                    ->setBody(
-                        sprintf('return %s;', (new NsArrayPrinter($namespace))->printArray($partConfig, 1, ''))
-                    );
-            }
-        }
     }
 
     public function getClassName(): string
@@ -115,9 +82,9 @@ class ConfigGenerator implements GeneratorInterface
 
             if (class_exists($config)) {
                 $this->currentConfig = (new $config())();
+            } else {
+                $this->currentConfig = [];
             }
-
-            $this->currentConfig = [];
         }
 
         return $this->currentConfig;

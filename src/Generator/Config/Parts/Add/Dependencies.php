@@ -24,21 +24,21 @@ final class Dependencies implements ConfigPartInterface
     /**
      * @inheritdoc
      */
-    public function getConfig(array $current = []): array
+    public function getConfig(): array
     {
         $inputFilterKey = $this->dataProvider->provide()['input_filter_name'];
         $hydratorKey = $this->dataProvider->provide()['hydrator_name'];
         $hydratorFactory = $this->dataProvider->provide()['factory_namespace'] . '\\' .
             $this->dataProvider->provide()['hydrator_factory_name'] . '::class';
 
-        return array_merge_recursive($current, [
+        return [
             'factories' => [
                 $hydratorKey => new PhpLiteral($hydratorFactory),
                 $inputFilterKey => new PhpLiteral(
                     '\SlayerBirden\DataFlowServer\Zend\InputFilter\ProxyFilterManagerFactory::class'
                 ),
             ],
-        ]);
+        ];
     }
 
     /**
@@ -47,13 +47,5 @@ final class Dependencies implements ConfigPartInterface
     public function getCode(): string
     {
         return self::PART_KEY;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getMethodName(): string
-    {
-        return 'getDependenciesConfig';
     }
 }

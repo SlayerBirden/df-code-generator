@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Zend\Code\Reflection\ClassReflection;
 
-class ReflectionInputFilter
+final class ReflectionInputFilter
 {
     /**
      * @var string

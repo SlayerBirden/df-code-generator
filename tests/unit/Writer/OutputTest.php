@@ -11,11 +11,10 @@ class OutputTest extends TestCase
 {
     public function testWrite()
     {
-        $fileNameProvider = $this->prophesize(FileNameProviderInterface::class);
         $output = $this->prophesize(OutputInterface::class);
 
-        $writer = new OutputWriter($output->reveal(), $fileNameProvider->reveal());
-        $writer->write('hello');
+        $writer = new OutputWriter($output->reveal());
+        $writer->write('hello', 'testfile');
 
         $output->writeln(Argument::exact('hello'))->shouldHaveBeenCalled();
     }

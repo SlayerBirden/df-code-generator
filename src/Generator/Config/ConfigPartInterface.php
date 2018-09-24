@@ -8,10 +8,9 @@ interface ConfigPartInterface
     /**
      * Get config array for current part
      *
-     * @param array $current
      * @return array
      */
-    public function getConfig(array $current = []): array;
+    public function getConfig(): array;
 
     /**
      * Part Code
@@ -19,11 +18,4 @@ interface ConfigPartInterface
      * @return string
      */
     public function getCode(): string;
-
-    /**
-     * Method name that is used to get config
-     *
-     * @return string
-     */
-    public function getMethodName(): string;
 }

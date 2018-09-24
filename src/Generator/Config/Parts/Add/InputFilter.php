@@ -20,13 +20,16 @@ final class InputFilter implements ConfigPartInterface, ArrayConfigPartInterface
     }
 
     /**
-     * Is not allows in this context
-     *
      * {@inheritdoc}
      */
-    public function getConfig(array $current = []): array
+    public function getConfig(): array
     {
-        throw new \LogicException('Invalid usage of getMethodName in ' . self::class);
+        $partsConfig = [];
+        foreach ($this->parts as $configPart) {
+            $partsConfig[$configPart->getCode()] = $configPart->getConfig();
+        }
+
+        return $partsConfig;
     }
 
     /**
@@ -35,16 +38,6 @@ final class InputFilter implements ConfigPartInterface, ArrayConfigPartInterface
     public function getCode(): string
     {
         return self::PART_KEY;
-    }
-
-    /**
-     * Is not allows in this context
-     *
-     * {@inheritdoc}
-     */
-    public function getMethodName(): string
-    {
-        throw new \LogicException('Invalid usage of getMethodName in ' . self::class);
     }
 
     /**
