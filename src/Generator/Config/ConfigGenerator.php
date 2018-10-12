@@ -121,6 +121,6 @@ final class ConfigGenerator implements GeneratorInterface
 
     public function getFileName(): string
     {
-        return sprintf('src/%s/ConfigProvider.php', $this->dataProvider->provide()['entityClassName']);
+        return sprintf('src/%s/ConfigProvider.php', $this->dataProvider->provide()['moduleName']);
     }
 }

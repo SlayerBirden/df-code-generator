@@ -9,7 +9,7 @@ final class ArrayUtils
     {
         $i = 0;
         $count = count($list);
-        while (isset($list[$i])) {
+        while (array_key_exists($i, $list)) {
             $i += 1;
             if ($i === $count) {
                 return true;
@@ -35,7 +35,11 @@ final class ArrayUtils
             foreach ($b as $value) {
                 $a[] = $value;
             }
-            return array_unique($a);
+            $unique = array_unique($a);
+            if (self::isSequential($a)) {
+                return array_values($unique);
+            }
+            return $unique;
         }
 
         foreach ($b as $key => $value) {

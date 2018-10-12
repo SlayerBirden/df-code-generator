@@ -5,7 +5,6 @@ namespace SlayerBirden\DFCodeGeneration\Writer;
 
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 
 class FileTest extends TestCase
 {

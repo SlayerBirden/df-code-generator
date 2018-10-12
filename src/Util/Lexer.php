@@ -54,18 +54,18 @@ final class Lexer
     /**
      * @param string $fullyQualifiedName
      * @return string
-     * @throws \ReflectionException
      */
     public static function getBaseName(string $fullyQualifiedName): string
     {
-        $reflection = new \ReflectionClass($fullyQualifiedName);
-        return $reflection->getShortName();
+        if (($pos = strrpos($fullyQualifiedName, '\\')) !== false) {
+            return ltrim(substr($fullyQualifiedName, $pos), '\\');
+        }
+        return $fullyQualifiedName;
     }
 
     /**
      * @param string $fullyQualifiedName
      * @return string
-     * @throws \ReflectionException
      */
     public static function getRefName(string $fullyQualifiedName): string
     {

@@ -14,6 +14,7 @@ use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\Entities
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\HydratorDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\InputFilterDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\NameSpaceDecorator as ConfigNsDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\OwnerDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\AddGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\NameSpaceDecorator as ControllerNSDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\RelationsProviderDecorator;
@@ -72,7 +73,8 @@ final class AddActionCommand extends AbstractApiCommand
                 new ControllerNSDecorator($this->entityClassName),
                 new HydratorDecorator($this->entityClassName),
                 new FactoryNSDecorator($this->entityClassName),
-                new FactoryHydratorDecorator($this->entityClassName)
+                new FactoryHydratorDecorator($this->entityClassName),
+                new OwnerDecorator($this->entityClassName)
             )
         );
         $addConfigGenerator = new ConfigGenerator(

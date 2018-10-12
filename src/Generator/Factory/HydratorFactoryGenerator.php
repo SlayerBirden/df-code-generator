@@ -79,7 +79,7 @@ final class HydratorFactoryGenerator implements GeneratorInterface
     {
         return sprintf(
             'src/%s/Factory/%s.php',
-            $this->dataProvider->provide()['entityClassName'],
+            $this->dataProvider->provide()['moduleName'],
             $this->getShortClassName()
         );
     }

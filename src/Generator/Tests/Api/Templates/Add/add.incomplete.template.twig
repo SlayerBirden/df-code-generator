@@ -1,0 +1,11 @@
+$I->wantTo('attempt to create incomplete {{ refName }}');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendPOST('/{{ refName }}', [
+{% for key, entity in incompleteEntityArray %}
+    '{{ key }}' => '{{ entity }}',
+{% endfor %}
+]);
+$I->seeResponseCodeIs(HttpCode::BAD_REQUEST);
+$I->seeResponseContainsJson([
+    'success' => false,
+]);

@@ -1,0 +1,17 @@
+$I->wantTo('successfully create {{ refName }}');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendPOST('/{{ refName }}', [
+{% for key, entity in validEntityArray %}
+    '{{ key }}' => '{{ entity }}',
+{% endfor %}
+]);
+// post second request with same dat
+$I->sendPOST('/{{ refName }}', [
+{% for key, entity in validEntityArray %}
+    '{{ key }}' => '{{ entity }}',
+{% endfor %}
+]);
+$I->seeResponseCodeIs(HttpCode::BAD_REQUEST);
+$I->seeResponseContainsJson([
+    'success' => false,
+]);

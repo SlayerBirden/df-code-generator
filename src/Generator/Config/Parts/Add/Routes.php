@@ -24,16 +24,20 @@ final class Routes implements ConfigPartInterface
      */
     public function getConfig(): array
     {
+        $entity = $this->dataProvider->provide()['refName'];
+        $middleware = [
+            '\SlayerBirden\DataFlowServer\Authentication\Middleware\TokenMiddleware::class',
+            \Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class,
+        ];
+        if ($this->dataProvider->provide()['has_owner']) {
+            $middleware[] = '\SlayerBirden\DataFlowServer\Domain\Middleware\SetOwnerMiddleware::class';
+        }
+        $middleware[] = $this->getControllerFullName();
         return [
             [
-                'path' => '/config',
-                'middleware' => [
-                    '\SlayerBirden\DataFlowServer\Authentication\Middleware\TokenMiddleware::class',
-                    \Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class,
-                    '\SlayerBirden\DataFlowServer\Domain\Middleware\SetOwnerMiddleware::class',
-                    $this->getControllerFullName(),
-                ],
-                'name' => 'add_config',
+                'path' => '/' . $entity,
+                'middleware' => $middleware,
+                'name' => 'add_' . $entity,
                 'allowed_methods' => ['POST'],
             ],
         ];

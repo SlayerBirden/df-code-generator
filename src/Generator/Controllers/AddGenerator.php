@@ -184,7 +184,7 @@ BODY
     {
         return sprintf(
             'src/%s/Controller/%s.php',
-            $this->dataProvider->provide()['entityClassName'],
+            $this->dataProvider->provide()['moduleName'],
             $this->getShortClassName()
         );
     }

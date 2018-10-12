@@ -45,7 +45,6 @@ final class InputFilterDecorator implements DataProviderDecoratorInterface
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
     private function getInputFilterName(): string
     {

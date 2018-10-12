@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use SlayerBirden\DFCodeGeneration\Command\Controllers\AddActionCommand;
+use SlayerBirden\DFCodeGeneration\Command\Tests\Api\AddTestCommand;
 use SlayerBirden\DFCodeGeneration\Writer\FileWriter;
 use Symfony\Component\Console\Application;
 
@@ -24,5 +25,6 @@ $app = new Application();
 
 $writer = new FileWriter($baseDir);
 $app->add(new AddActionCommand(null, $writer));
+$app->add(new AddTestCommand(null, $writer));
 
 $app->run();

@@ -19,7 +19,6 @@ final class BaseProvider implements DataProviderInterface
 
     /**
      * @return array
-     * @throws \ReflectionException
      */
     public function provide(): array
     {
@@ -27,6 +26,16 @@ final class BaseProvider implements DataProviderInterface
             'entityName' => $this->entityClassName,
             'refName' => Lexer::getRefName($this->entityClassName),
             'entityClassName' => Lexer::getBaseName($this->entityClassName),
+            'moduleName' => $this->getModuleName($this->entityClassName),
         ];
+    }
+
+    private function getModuleName(string $entityName): string
+    {
+        $parts = explode('\\', trim($entityName, '\\'));
+        if (isset($parts[2])) {
+            return $parts[2];
+        }
+        return end($parts);
     }
 }

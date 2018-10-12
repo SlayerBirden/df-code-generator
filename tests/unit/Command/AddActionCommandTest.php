@@ -3,19 +3,12 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Command;
 
+use Doctrine\ORM\Mapping as ORM;
 use PHPUnit\Framework\TestCase;
 use SlayerBirden\DFCodeGeneration\Command\Controllers\AddActionCommand;
-use SlayerBirden\DFCodeGeneration\Util\CodeLoader;
 use SlayerBirden\DFCodeGeneration\Writer\WriteInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class AddActionCommandTest extends TestCase
-{
-    public static function setUpBeforeClass()
-    {
-        $hubbyBody = <<<'HUBBY'
-<?php
-use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity @ORM\Table(name="hubbies")
  */
@@ -33,16 +26,15 @@ class Hubby
      */
     private $name;
 }
-HUBBY;
-        CodeLoader::loadCode($hubbyBody, 'hubbyEntity.php');
-    }
 
+class AddActionCommandTest extends TestCase
+{
     public function testExecuteDryRun()
     {
         $writer = $this->prophesize(WriteInterface::class);
         $tester = new CommandTester(new AddActionCommand(null, $writer->reveal()));
         $tester->execute([
-            'entity' => 'Hubby',
+            'entity' => Hubby::class,
         ]);
 
         $display = $tester->getDisplay();
@@ -67,7 +59,7 @@ HUBBY;
         };
         $tester = new CommandTester(new AddActionCommand(null, $writer));
         $tester->execute([
-            'entity' => 'Hubby',
+            'entity' => Hubby::class,
             '--force' => true,
         ]);
 

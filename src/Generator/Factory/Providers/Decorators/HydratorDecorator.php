@@ -21,7 +21,6 @@ final class HydratorDecorator implements DataProviderDecoratorInterface
     /**
      * @param array $data
      * @return array
-     * @throws \ReflectionException
      */
     public function decorate(array $data): array
     {
@@ -32,7 +31,6 @@ final class HydratorDecorator implements DataProviderDecoratorInterface
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
     private function getHydratorFactoryName(): string
     {

@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators;
 
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderDecoratorInterface;
-use SlayerBirden\DFCodeGeneration\Util\Lexer;
 
-final class HydratorDecorator implements DataProviderDecoratorInterface
+final class OwnerDecorator implements DataProviderDecoratorInterface
 {
     /**
      * @var string
@@ -21,19 +20,21 @@ final class HydratorDecorator implements DataProviderDecoratorInterface
     /**
      * @param array $data
      * @return array
+     * @throws \ReflectionException
      */
     public function decorate(array $data): array
     {
-        $data['hydrator_name'] = $this->getHydratorName();
+        $reflectionClassName = new \ReflectionClass($this->entityClassName);
+
+        $hasOwner = false;
+        foreach ($reflectionClassName->getProperties() as $property) {
+            if ($property->getName() === 'owner') {
+                $hasOwner = true;
+                break;
+            }
+        }
+        $data['has_owner'] = $hasOwner;
 
         return $data;
-    }
-
-    /**
-     * @return string
-     */
-    private function getHydratorName(): string
-    {
-        return Lexer::getBaseName($this->entityClassName) . 'Hydrator';
     }
 }
