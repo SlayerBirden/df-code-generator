@@ -104,6 +104,10 @@ final class NsArrayPrinter
         }
         // then checks for backslash
         if (is_string($variable) && (strpos($variable, '\\') !== false)) {
+            if (strpos($variable, ':\\') !== false) {
+                // semicolon means this is not a class name
+                return $variable;
+            }
             return $this->phpNamespace->unresolveName($variable) . '::class';
         }
         return var_export($variable, true);

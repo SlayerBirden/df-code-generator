@@ -113,6 +113,10 @@ final class ConfigGenerator implements GeneratorInterface
         if (is_string($record) && (strpos($record, '::class') !== false)) {
             $phpNamespace->addUse(str_replace('::class', '', $record));
         } elseif (is_string($record) && (strpos($record, '\\') !== false)) {
+            if (strpos($record, ':\\') !== false) {
+                // don't add use if this is not a class name
+                return;
+            }
             $phpNamespace->addUse($record);
         } elseif (($record instanceof PhpLiteral) && (strpos((string)$record, '::class') !== false)) {
             $phpNamespace->addUse(str_replace('::class', '', (string)$record));

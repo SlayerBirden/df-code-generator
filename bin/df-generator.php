@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 use SlayerBirden\DFCodeGeneration\Command\Controllers\AddActionCommand;
+use SlayerBirden\DFCodeGeneration\Command\Controllers\DeleteActionCommand;
+use SlayerBirden\DFCodeGeneration\Command\Controllers\GetActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\AddTestCommand;
 use SlayerBirden\DFCodeGeneration\Writer\FileWriter;
 use Symfony\Component\Console\Application;
@@ -24,7 +26,13 @@ foreach ($autoloadPaths as $path) {
 $app = new Application();
 
 $writer = new FileWriter($baseDir);
+// add
 $app->add(new AddActionCommand(null, $writer));
 $app->add(new AddTestCommand(null, $writer));
+// delete
+$app->add(new DeleteActionCommand(null, $writer));
+
+// get
+$app->add(new GetActionCommand(null, $writer));
 
 $app->run();

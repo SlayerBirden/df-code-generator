@@ -1,0 +1,6 @@
+return new BaseResourceMiddleware(
+    $container->get(EntityManagerRegistry::class),
+    $container->get(LoggerInterface::class),
+    {{ entityClassName }}::class,
+    '{{ refName }}'
+);

@@ -4,16 +4,16 @@ declare(strict_types=1);
 namespace SlayerBirden\DFCodeGeneration\Command;
 
 use PHPUnit\Framework\TestCase;
-use SlayerBirden\DFCodeGeneration\Command\Controllers\AddActionCommand;
+use SlayerBirden\DFCodeGeneration\Command\Controllers\DeleteActionCommand;
 use SlayerBirden\DFCodeGeneration\Writer\WriteInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class AddActionCommandTest extends TestCase
+final class DeleteActionCommandTest extends TestCase
 {
     public function testExecuteDryRun()
     {
         $writer = $this->prophesize(WriteInterface::class);
-        $tester = new CommandTester(new AddActionCommand(null, $writer->reveal()));
+        $tester = new CommandTester(new DeleteActionCommand(null, $writer->reveal()));
         $tester->execute([
             'entity' => Hubby::class,
         ]);
@@ -21,11 +21,12 @@ class AddActionCommandTest extends TestCase
         $display = $tester->getDisplay();
 
         # controller
-        $this->assertContains('AddHubbyAction', $display);
+        $this->assertContains('DeleteHubbyAction', $display);
         # config
         $this->assertContains('ConfigProvider', $display);
         # factories
         $this->assertContains('HubbyHydratorFactory', $display);
+        $this->assertContains('HubbyResourceMiddlewareFactory', $display);
     }
 
     public function testExecuteForce()
@@ -38,7 +39,7 @@ class AddActionCommandTest extends TestCase
                 $this->content .= $content;
             }
         };
-        $tester = new CommandTester(new AddActionCommand(null, $writer));
+        $tester = new CommandTester(new DeleteActionCommand(null, $writer));
         $tester->execute([
             'entity' => Hubby::class,
             '--force' => true,
@@ -46,10 +47,11 @@ class AddActionCommandTest extends TestCase
 
         $content = $writer->content;
 
-        $this->assertContains('AddHubbyAction', $content);
+        $this->assertContains('DeleteHubbyAction', $content);
         # config
         $this->assertContains('ConfigProvider', $content);
         # factories
         $this->assertContains('HubbyHydratorFactory', $content);
+        $this->assertContains('HubbyResourceMiddlewareFactory', $content);
     }
 }

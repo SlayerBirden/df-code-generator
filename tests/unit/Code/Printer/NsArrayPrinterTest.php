@@ -94,6 +94,17 @@ ARRAY
 ARRAY
 
             ],
+            [
+                ['{id:\d+}'],
+                $ns,
+                <<<ARRAY
+[
+    {id:\d+},
+],
+
+ARRAY
+
+            ],
         ];
     }
 }

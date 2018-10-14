@@ -12,7 +12,7 @@ use SlayerBirden\DFCodeGeneration\Generator\GeneratorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-final class HydratorFactoryGenerator implements GeneratorInterface
+final class ResourceMiddlewareFactoryGenerator implements GeneratorInterface
 {
     /**
      * @var DataProviderInterface
@@ -44,15 +44,12 @@ final class HydratorFactoryGenerator implements GeneratorInterface
 
         $namespace = $file->addNamespace($this->getFactoryNamespace());
         $namespace->addUse(\Interop\Container\ContainerInterface::class);
-        if (!empty($this->getSingleDeps())) {
-            $namespace->addUse('\SlayerBirden\DataFlowServer\Doctrine\Hydrator\Strategy\NestedEntityStrategy');
-        }
-        if (!empty($this->getMultiDeps())) {
-            $namespace->addUse('\SlayerBirden\DataFlowServer\Doctrine\Hydrator\Strategy\CollectionStrategy');
-        }
-        $namespace->addUse(\Zend\Hydrator\ClassMethods::class);
+        $namespace->addUse(\Psr\Log\LoggerInterface::class);
+        $namespace->addUse($this->dataProvider->provide()['entityName']);
         $namespace->addUse(\Zend\ServiceManager\Factory\FactoryInterface::class);
-        $namespace->addUse(\Zend\Hydrator\HydratorInterface::class);
+        $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Middleware\BaseResourceMiddleware');
+        $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Persistence\EntityManagerRegistry');
+        $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Middleware\ResourceMiddlewareInterface');
 
         $class = $namespace->addClass($this->getShortClassName());
 
@@ -64,9 +61,10 @@ final class HydratorFactoryGenerator implements GeneratorInterface
                 (new Parameter('requestedName')),
                 (new Parameter('options'))->setTypeHint('array')->setDefaultValue(null)
             ])
-            ->setReturnType(\Zend\Hydrator\HydratorInterface::class)
+            ->setReturnType('SlayerBirden\DataFlowServer\Doctrine\Middleware\ResourceMiddlewareInterface')
             ->setBody(
-                $this->twig->load('HydratorFactory/Invoke.template.twig')->render($this->dataProvider->provide())
+                $this->twig->load('ResourceMiddlewareFactory/Invoke.template.twig')
+                    ->render($this->dataProvider->provide())
             )
             ->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
@@ -92,7 +90,7 @@ final class HydratorFactoryGenerator implements GeneratorInterface
      */
     private function getShortClassName(): string
     {
-        return $this->dataProvider->provide()['hydrator_factory_name'];
+        return $this->dataProvider->provide()['entityClassName'] . 'ResourceMiddlewareFactory';
     }
 
     /**
@@ -101,15 +99,5 @@ final class HydratorFactoryGenerator implements GeneratorInterface
     private function getFactoryNamespace(): string
     {
         return $this->dataProvider->provide()['factory_namespace'];
-    }
-
-    private function getSingleDeps(): array
-    {
-        return $this->dataProvider->provide()['single_deps'];
-    }
-
-    private function getMultiDeps(): array
-    {
-        return $this->dataProvider->provide()['multi_deps'];
     }
 }

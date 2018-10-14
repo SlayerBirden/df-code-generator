@@ -20,20 +20,14 @@ final class OwnerDecorator implements DataProviderDecoratorInterface
     /**
      * @param array $data
      * @return array
-     * @throws \ReflectionException
      */
     public function decorate(array $data): array
     {
-        $reflectionClassName = new \ReflectionClass($this->entityClassName);
-
-        $hasOwner = false;
-        foreach ($reflectionClassName->getProperties() as $property) {
-            if ($property->getName() === 'owner') {
-                $hasOwner = true;
-                break;
-            }
-        }
-        $data['has_owner'] = $hasOwner;
+        $data['has_owner'] = in_array(
+            'SlayerBirden\DataFlowServer\Domain\Entities\ClaimedResourceInterface',
+            class_implements($this->entityClassName),
+            true
+        );
 
         return $data;
     }
