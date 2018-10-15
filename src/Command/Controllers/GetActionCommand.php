@@ -48,7 +48,7 @@ final class GetActionCommand extends AbstractApiCommand
         $baseProvider = new BaseProvider($this->entityClassName);
         $controllerNsDecorator = new ControllerNSDecorator($this->entityClassName);
 
-        $addGenerator = new GetGenerator(
+        $controllerGenerator = new GetGenerator(
             new CachedProvider(
                 new DecoratedProvider(
                     $baseProvider,
@@ -56,7 +56,7 @@ final class GetActionCommand extends AbstractApiCommand
                 )
             )
         );
-        $this->writer->write($addGenerator->generate(), $addGenerator->getFileName());
+        $this->writer->write($controllerGenerator->generate(), $controllerGenerator->getFileName());
 
         $configDataProvider = new CachedProvider(
             new DecoratedProvider(

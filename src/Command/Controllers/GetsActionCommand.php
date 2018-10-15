@@ -12,7 +12,9 @@ use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\Entities
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\HydratorDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\NameSpaceDecorator as ConfigNsDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\OwnerDecorator;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\DeleteGenerator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\GetGenerator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\GetsGenerator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\EntityNamePluralDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\NameSpaceDecorator as ControllerNSDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\RelationsProviderDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\BaseProvider;
@@ -21,18 +23,19 @@ use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DecoratedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\HydratorFactoryGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators\HydratorDecorator as FactoryHydratorDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators\NameSpaceDecorator as FactoryNSDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Factory\RepositoryFactoryGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\ResourceMiddlewareFactoryGenerator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class DeleteActionCommand extends AbstractApiCommand
+final class GetsActionCommand extends AbstractApiCommand
 {
     protected function configure()
     {
         parent::configure();
-        $this->setName('generate:action:delete')
-            ->setDescription('Delete action controller and support configuration.')
-            ->setHelp('This command creates the Delete Action for given entity.');
+        $this->setName('generate:action:gets')
+            ->setDescription('Get List action controller and support configuration.')
+            ->setHelp('This command creates the Get List Action for given entity.');
     }
 
     /**
@@ -48,11 +51,12 @@ final class DeleteActionCommand extends AbstractApiCommand
         $baseProvider = new BaseProvider($this->entityClassName);
         $controllerNsDecorator = new ControllerNSDecorator($this->entityClassName);
 
-        $controllerGenerator = new DeleteGenerator(
+        $controllerGenerator = new GetsGenerator(
             new CachedProvider(
                 new DecoratedProvider(
                     $baseProvider,
-                    $controllerNsDecorator
+                    $controllerNsDecorator,
+                    new EntityNamePluralDecorator()
                 )
             )
         );
@@ -67,7 +71,8 @@ final class DeleteActionCommand extends AbstractApiCommand
                 new HydratorDecorator($this->entityClassName),
                 new FactoryNSDecorator($this->entityClassName),
                 new FactoryHydratorDecorator($this->entityClassName),
-                new OwnerDecorator($this->entityClassName)
+                new OwnerDecorator($this->entityClassName),
+                new EntityNamePluralDecorator()
             )
         );
         $configGenerator = new ConfigGenerator(
@@ -76,9 +81,9 @@ final class DeleteActionCommand extends AbstractApiCommand
                 new DefaultCodeFeederPart()
             ),
             new Parts\Doctrine($configDataProvider),
-            new Parts\Delete\AbstractFactory($configDataProvider),
-            new Parts\Delete\Dependencies($configDataProvider),
-            new Parts\Delete\Routes($configDataProvider)
+            new Parts\Gets\AbstractFactory($configDataProvider),
+            new Parts\Gets\Dependencies($configDataProvider),
+            new Parts\Gets\Routes($configDataProvider)
         );
         $this->writer->write($configGenerator->generate(), $configGenerator->getFileName());
 
@@ -94,7 +99,7 @@ final class DeleteActionCommand extends AbstractApiCommand
         );
         $this->writer->write($hydratorFactoryGenerator->generate(), $hydratorFactoryGenerator->getFileName());
 
-        $resourceMiddlewareFactoryGenerator = new ResourceMiddlewareFactoryGenerator(
+        $repositoryFactoryGenerator = new RepositoryFactoryGenerator(
             new CachedProvider(
                 new DecoratedProvider(
                     $baseProvider,
@@ -103,8 +108,8 @@ final class DeleteActionCommand extends AbstractApiCommand
             )
         );
         $this->writer->write(
-            $resourceMiddlewareFactoryGenerator->generate(),
-            $resourceMiddlewareFactoryGenerator->getFileName()
+            $repositoryFactoryGenerator->generate(),
+            $repositoryFactoryGenerator->getFileName()
         );
 
         parent::execute($input, $output);

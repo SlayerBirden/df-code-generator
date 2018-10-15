@@ -11,7 +11,8 @@ final class EntityNamePluralDecorator implements DataProviderDecoratorInterface
     public function decorate(array $data): array
     {
         if (isset($data['entityName'])) {
-            $data['pluralEntityName'] = Lexer::getPluralForm($data['entityName']);
+            $data['pluralEntityName'] = Lexer::getPluralForm($data['entityClassName']);
+            $data['pluralRefName'] = Lexer::getPluralForm($data['refName']);
         }
 
         return $data;

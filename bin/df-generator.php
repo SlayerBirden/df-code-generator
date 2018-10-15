@@ -4,6 +4,7 @@ declare(strict_types=1);
 use SlayerBirden\DFCodeGeneration\Command\Controllers\AddActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Controllers\DeleteActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Controllers\GetActionCommand;
+use SlayerBirden\DFCodeGeneration\Command\Controllers\GetsActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\AddTestCommand;
 use SlayerBirden\DFCodeGeneration\Writer\FileWriter;
 use Symfony\Component\Console\Application;
@@ -35,4 +36,6 @@ $app->add(new DeleteActionCommand(null, $writer));
 // get
 $app->add(new GetActionCommand(null, $writer));
 
+//gets
+$app->add(new GetsActionCommand(null, $writer));
 $app->run();

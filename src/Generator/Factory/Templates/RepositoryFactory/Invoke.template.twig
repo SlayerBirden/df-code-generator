@@ -1,0 +1,4 @@
+/** @var EntityManagerRegistry $manager */
+$manager = $container->get(EntityManagerRegistry::class);
+
+return $manager->getRepository({{ entityClassName }}::class);
