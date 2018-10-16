@@ -1,0 +1,22 @@
+$I->wantTo('attempt to mutate existing record by providing ID');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendPOST('/{{ refName }}', [
+{% for key, entity in validEntityArray %}
+    '{{ key }}' => '{{ entity }}',
+{% endfor %}
+]);
+
+$entities = $I->grabEntitiesFromRepository({{ entityClassName }}::class);
+$lastId = (end($entities))->{{ idGetter }}();
+
+$I->sendPOST('/{{ refName }}', [
+    '{{ idName }}' => $lastId,
+{% for key, entity in validEntityArray %}
+    '{{ key }}' => '{{ entity }}',
+{% endfor %}
+]);
+
+$entities = $I->grabEntitiesFromRepository({{ entityClassName }}::class);
+$newLastId = (end($entities))->{{ idGetter }}();
+
+$I->assertNotEquals($lastId, $newLastId);

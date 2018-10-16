@@ -1,19 +1,19 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Command;
+namespace SlayerBirden\DFCodeGeneration\Command\Controllers;
 
 use PHPUnit\Framework\TestCase;
-use SlayerBirden\DFCodeGeneration\Command\Controllers\GetActionCommand;
+use SlayerBirden\DFCodeGeneration\Command\Hubby;
 use SlayerBirden\DFCodeGeneration\Writer\WriteInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-final class GetActionCommandTest extends TestCase
+final class GetsActionCommandTest extends TestCase
 {
     public function testExecuteDryRun()
     {
         $writer = $this->prophesize(WriteInterface::class);
-        $tester = new CommandTester(new GetActionCommand(null, $writer->reveal()));
+        $tester = new CommandTester(new GetsActionCommand(null, $writer->reveal()));
         $tester->execute([
             'entity' => Hubby::class,
         ]);
@@ -21,12 +21,12 @@ final class GetActionCommandTest extends TestCase
         $display = $tester->getDisplay();
 
         # controller
-        $this->assertContains('GetHubbyAction', $display);
+        $this->assertContains('GetHubbiesAction', $display);
         # config
         $this->assertContains('ConfigProvider', $display);
         # factories
         $this->assertContains('HubbyHydratorFactory', $display);
-        $this->assertContains('HubbyResourceMiddlewareFactory', $display);
+        $this->assertContains('HubbyRepositoryFactory', $display);
     }
 
     public function testExecuteForce()
@@ -39,7 +39,7 @@ final class GetActionCommandTest extends TestCase
                 $this->content .= $content;
             }
         };
-        $tester = new CommandTester(new GetActionCommand(null, $writer));
+        $tester = new CommandTester(new GetsActionCommand(null, $writer));
         $tester->execute([
             'entity' => Hubby::class,
             '--force' => true,
@@ -47,11 +47,11 @@ final class GetActionCommandTest extends TestCase
 
         $content = $writer->content;
 
-        $this->assertContains('GetHubbyAction', $content);
+        $this->assertContains('GetHubbiesAction', $content);
         # config
         $this->assertContains('ConfigProvider', $content);
         # factories
         $this->assertContains('HubbyHydratorFactory', $content);
-        $this->assertContains('HubbyResourceMiddlewareFactory', $content);
+        $this->assertContains('HubbyRepositoryFactory', $content);
     }
 }

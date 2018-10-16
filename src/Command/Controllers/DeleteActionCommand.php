@@ -9,6 +9,7 @@ use SlayerBirden\DFCodeGeneration\Generator\Config\Code\SplitArrayCodeFeeder;
 use SlayerBirden\DFCodeGeneration\Generator\Config\ConfigGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Parts;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\EntitiesSrcDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\EntityIdDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\HydratorDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\NameSpaceDecorator as ConfigNsDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\OwnerDecorator;
@@ -30,7 +31,7 @@ final class DeleteActionCommand extends AbstractApiCommand
     protected function configure()
     {
         parent::configure();
-        $this->setName('generate:action:delete')
+        $this->setName('action:delete')
             ->setDescription('Delete action controller and support configuration.')
             ->setHelp('This command creates the Delete Action for given entity.');
     }
@@ -63,11 +64,12 @@ final class DeleteActionCommand extends AbstractApiCommand
                 $baseProvider,
                 new EntitiesSrcDecorator($this->entityClassName),
                 new ConfigNsDecorator($this->entityClassName),
-                new ControllerNSDecorator($this->entityClassName),
+                $controllerNsDecorator,
                 new HydratorDecorator($this->entityClassName),
                 new FactoryNSDecorator($this->entityClassName),
                 new FactoryHydratorDecorator($this->entityClassName),
-                new OwnerDecorator($this->entityClassName)
+                new OwnerDecorator($this->entityClassName),
+                new EntityIdDecorator($this->entityClassName)
             )
         );
         $configGenerator = new ConfigGenerator(

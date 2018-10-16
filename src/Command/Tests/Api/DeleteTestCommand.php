@@ -5,23 +5,24 @@ namespace SlayerBirden\DFCodeGeneration\Command\Tests\Api;
 
 use SlayerBirden\DFCodeGeneration\Command\AbstractApiCommand;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\EntityIdDecorator;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\UniqueProviderDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\OwnerDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\RelationsProviderDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\BaseProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\CachedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DecoratedProvider;
-use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\AddGenerator;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\DeleteGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\Providers\Decorators\EntityDataDecorator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class AddTestCommand extends AbstractApiCommand
+final class DeleteTestCommand extends AbstractApiCommand
 {
     protected function configure()
     {
         parent::configure();
-        $this->setName('test:api:add')
-            ->setDescription('Api Test for add action.')
-            ->setHelp('This command creates the Codeception Api Test for Add Action for given entity.');
+        $this->setName('test:api:delete')
+            ->setDescription('Api Test for delete action.')
+            ->setHelp('This command creates the Codeception Api Test for Delete Action for given entity.');
     }
 
     /**
@@ -36,13 +37,14 @@ final class AddTestCommand extends AbstractApiCommand
     {
         $baseProvider = new BaseProvider($this->entityClassName);
 
-        $generator = new AddGenerator(
+        $generator = new DeleteGenerator(
             new CachedProvider(
                 new DecoratedProvider(
                     $baseProvider,
-                    new UniqueProviderDecorator($this->entityClassName),
                     new EntityDataDecorator($this->entityClassName),
-                    new EntityIdDecorator($this->entityClassName)
+                    new EntityIdDecorator($this->entityClassName),
+                    new RelationsProviderDecorator($this->entityClassName),
+                    new OwnerDecorator($this->entityClassName)
                 )
             )
         );

@@ -12,7 +12,6 @@ use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\Entities
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\HydratorDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\NameSpaceDecorator as ConfigNsDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\OwnerDecorator;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\GetGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\GetsGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\EntityNamePluralDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\NameSpaceDecorator as ControllerNSDecorator;
@@ -24,7 +23,6 @@ use SlayerBirden\DFCodeGeneration\Generator\Factory\HydratorFactoryGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators\HydratorDecorator as FactoryHydratorDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators\NameSpaceDecorator as FactoryNSDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\RepositoryFactoryGenerator;
-use SlayerBirden\DFCodeGeneration\Generator\Factory\ResourceMiddlewareFactoryGenerator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -33,7 +31,7 @@ final class GetsActionCommand extends AbstractApiCommand
     protected function configure()
     {
         parent::configure();
-        $this->setName('generate:action:gets')
+        $this->setName('action:gets')
             ->setDescription('Get List action controller and support configuration.')
             ->setHelp('This command creates the Get List Action for given entity.');
     }
@@ -67,7 +65,7 @@ final class GetsActionCommand extends AbstractApiCommand
                 $baseProvider,
                 new EntitiesSrcDecorator($this->entityClassName),
                 new ConfigNsDecorator($this->entityClassName),
-                new ControllerNSDecorator($this->entityClassName),
+                $controllerNsDecorator,
                 new HydratorDecorator($this->entityClassName),
                 new FactoryNSDecorator($this->entityClassName),
                 new FactoryHydratorDecorator($this->entityClassName),

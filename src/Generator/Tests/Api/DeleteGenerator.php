@@ -12,7 +12,7 @@ use SlayerBirden\DFCodeGeneration\Generator\GeneratorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-final class AddGenerator implements GeneratorInterface
+final class DeleteGenerator implements GeneratorInterface
 {
     /**
      * @var DataProviderInterface
@@ -47,56 +47,50 @@ final class AddGenerator implements GeneratorInterface
         $namespace->addUse('codecept\ApiTester');
         $namespace->addUse('Codeception\Util\HttpCode');
         $namespace->addUse($this->dataProvider->provide()['entityName']);
+        if ($this->dataProvider->provide()['has_owner']) {
+            $namespace->addUse('SlayerBirden\DataFlowServer\Domain\Entities\User');
+        }
 
-        $class = $namespace->addClass('AddCest');
+        $class = $namespace->addClass('DeleteCest');
 
-        $class->addMethod('add' . $this->dataProvider->provide()['entityClassName'])
+        $class->addMethod('_before')
             ->setParameters([
                 (new Parameter('I'))->setTypeHint('\codecept\ApiTester'),
             ])
             ->setBody(
-                $this->twig->load('Add/add.template.twig')->render($this->dataProvider->provide())
+                $this->twig->load('Delete/before.template.twig')->render($this->dataProvider->provide())
             )
             ->setReturnType('void')
             ->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
-        $class->addMethod('addIncomplete' . $this->dataProvider->provide()['entityClassName'])
+        $class->addMethod('delete' . $this->dataProvider->provide()['entityClassName'])
             ->setParameters([
                 (new Parameter('I'))->setTypeHint('\codecept\ApiTester'),
             ])
             ->setBody(
-                $this->twig->load('Add/add.incomplete.template.twig')->render($this->dataProvider->provide())
+                $this->twig->load('Delete/delete.template.twig')->render($this->dataProvider->provide())
             )
             ->setReturnType('void')
             ->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
-        $class->addMethod('addInvalid' . $this->dataProvider->provide()['entityClassName'])
+        $class->addMethod('deleteNonExisting' . $this->dataProvider->provide()['entityClassName'])
             ->setParameters([
                 (new Parameter('I'))->setTypeHint('\codecept\ApiTester'),
             ])
             ->setBody(
-                $this->twig->load('Add/add.invalid.template.twig')->render($this->dataProvider->provide())
+                $this->twig->load('Delete/delete.nonexisting.template.twig')->render($this->dataProvider->provide())
             )
             ->setReturnType('void')
             ->setVisibility(ClassType::VISIBILITY_PUBLIC);
 
-        $class->addMethod('mutateExisting' . $this->dataProvider->provide()['entityClassName'])
-            ->setParameters([
-                (new Parameter('I'))->setTypeHint('\codecept\ApiTester'),
-            ])
-            ->setBody(
-                $this->twig->load('Add/mutate.template.twig')->render($this->dataProvider->provide())
-            )
-            ->setReturnType('void')
-            ->setVisibility(ClassType::VISIBILITY_PUBLIC);
-
-        if ($this->dataProvider->provide()['hasUnique']) {
-            $class->addMethod('addNonUnique' . $this->dataProvider->provide()['entityClassName'])
+        if ($this->dataProvider->provide()['has_owner']) {
+            $class->addMethod('deleteSomeoneElses' . $this->dataProvider->provide()['entityClassName'])
                 ->setParameters([
                     (new Parameter('I'))->setTypeHint('\codecept\ApiTester'),
                 ])
                 ->setBody(
-                    $this->twig->load('Add/add.nonunique.template.twig')->render($this->dataProvider->provide())
+                    $this->twig->load('Delete/delete.someoneeleses.template.twig')
+                        ->render($this->dataProvider->provide())
                 )
                 ->setReturnType('void')
                 ->setVisibility(ClassType::VISIBILITY_PUBLIC);
@@ -107,13 +101,13 @@ final class AddGenerator implements GeneratorInterface
 
     public function getClassName(): string
     {
-        return $this->getNameSpace() . '\\' . 'AddCest';
+        return $this->getNameSpace() . '\\' . 'DeleteCest';
     }
 
     public function getFileName(): string
     {
         return sprintf(
-            'tests/api/%s/%s/AddCest.php',
+            'tests/api/%s/%s/DeleteCest.php',
             strtolower($this->dataProvider->provide()['moduleName']),
             $this->dataProvider->provide()['refName']
         );

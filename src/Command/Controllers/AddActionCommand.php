@@ -33,7 +33,7 @@ final class AddActionCommand extends AbstractApiCommand
     protected function configure()
     {
         parent::configure();
-        $this->setName('generate:action:add')
+        $this->setName('action:add')
             ->setDescription('Add action controller and support configuration.')
             ->setHelp('This command creates the Add Action for given entity.');
     }
@@ -70,7 +70,7 @@ final class AddActionCommand extends AbstractApiCommand
                 new EntitiesSrcDecorator($this->entityClassName),
                 new InputFilterDecorator($this->entityClassName),
                 new ConfigNsDecorator($this->entityClassName),
-                new ControllerNSDecorator($this->entityClassName),
+                $controllerNsDecorator,
                 new HydratorDecorator($this->entityClassName),
                 new FactoryNSDecorator($this->entityClassName),
                 new FactoryHydratorDecorator($this->entityClassName),

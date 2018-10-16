@@ -1,0 +1,14 @@
+$I->wantTo('delete {{ refName }} with {{ idName }} 1');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendDELETE('/{{ refName }}/1');
+$I->seeResponseCodeIs(HttpCode::OK);
+$I->seeResponseContainsJson([
+    'success' => true,
+    'data' => [
+        '{{ refName }}' => [
+{% for key, entity in validEntityArray %}
+            '{{ key }}' => '{{ entity }}',
+{% endfor %}
+        ]
+    ]
+]);

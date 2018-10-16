@@ -1,0 +1,23 @@
+$userId = $I->haveInRepository(User::class, [
+    'first' => 'Tester2',
+    'last' => 'Tester2',
+    'email' => 'test2@example.com',
+]);
+$user = $I->grabEntityFromRepository(User::class, ['id' => $userId]);
+
+$I->haveInRepository({{ entityClassName }}::class, [
+{% for key, entity in validEntityArray %}
+{% if key is not same as('owner') %}
+    '{{ key }}' => '{{ entity }}',
+{% endif %}
+{% endfor %}
+    'owner' => $user,
+]);
+
+$I->wantTo('delete someone elses {{ refName }}');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendDELETE('/{{ refName }}/2');
+$I->seeResponseCodeIs(HttpCode::FORBIDDEN);
+$I->seeResponseContainsJson([
+    'success' => false,
+]);

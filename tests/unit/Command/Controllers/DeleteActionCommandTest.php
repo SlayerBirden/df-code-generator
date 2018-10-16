@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Command;
+namespace SlayerBirden\DFCodeGeneration\Command\Controllers;
 
 use PHPUnit\Framework\TestCase;
-use SlayerBirden\DFCodeGeneration\Command\Controllers\DeleteActionCommand;
+use SlayerBirden\DFCodeGeneration\Command\Hubby;
 use SlayerBirden\DFCodeGeneration\Writer\WriteInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 

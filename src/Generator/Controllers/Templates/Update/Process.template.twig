@@ -1,16 +1,16 @@
 $data = Parser::getRequestBody($request);
+$entity = $request->getAttribute(ResourceMiddlewareInterface::DATA_RESOURCE);
 $this->inputFilter->setData($data);
 
 if (!$this->inputFilter->isValid()) {
     return (new ValidationResponseFactory())('{{ refName }}', $this->inputFilter);
 }
 try {
-    $entity = new {{ entityClassName }}();
     $this->hydrator->hydrate($data, $entity);
-    $em = $this->managerRegistry->getManagerForClass({{ entityClassName }}::class);
+    $em = $this->managerRegistry->getManagerForClass(DbConfiguration::class);
     $em->persist($entity);
     $em->flush();
-    $msg = '{{ entityClassName }} has been successfully created!';
+    $msg = '{{ entityClassName }} has been updated!';
     return (new GeneralSuccessResponseFactory())($msg, '{{ refName }}', $this->hydrator->extract($entity));
 } catch (ORMInvalidArgumentException $exception) {
     return (new GeneralErrorResponseFactory())($exception->getMessage(), '{{ refName }}', 400);
@@ -20,5 +20,5 @@ try {
 {% endif %}
 } catch (ORMException $exception) {
     $this->logger->error((string)$exception);
-    return (new GeneralErrorResponseFactory())('Error during creation operation.', '{{ refName }}', 400);
+    return (new GeneralErrorResponseFactory())('Error while updating {{ refName }}.', '{{ refName }}', 400);
 }

@@ -15,7 +15,7 @@ use SlayerBirden\DFCodeGeneration\Generator\GeneratorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-final class AddGenerator implements GeneratorInterface
+final class UpdateGenerator implements GeneratorInterface
 {
     /**
      * @var DataProviderInterface
@@ -41,12 +41,11 @@ final class AddGenerator implements GeneratorInterface
      */
     private function getProcessMethodBody(): string
     {
-        return $this->twig->load('Add/Process.template.twig')->render($this->dataProvider->provide());
+        return $this->twig->load('Update/Process.template.twig')->render($this->dataProvider->provide());
     }
 
     /**
      * @return string
-     * @throws \ReflectionException
      * @throws \Twig_Error_Loader
      * @throws \Twig_Error_Runtime
      * @throws \Twig_Error_Syntax
@@ -119,6 +118,7 @@ BODY
         $namespace->addUse('Psr\Http\Server\MiddlewareInterface');
         $namespace->addUse('Psr\Http\Server\RequestHandlerInterface');
         $namespace->addUse('Psr\Log\LoggerInterface');
+        $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Middleware\ResourceMiddlewareInterface');
         $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Persistence\EntityManagerRegistry');
         $namespace->addUse($this->getEntityName());
         $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\Request\Parser');
@@ -142,7 +142,7 @@ BODY
      */
     private function getShortClassName(): string
     {
-        return 'Add' . $this->dataProvider->provide()['entityClassName'] . 'Action';
+        return 'Update' . $this->dataProvider->provide()['entityClassName'] . 'Action';
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SlayerBirden\DFCodeGeneration\Generator\Config\Parts\Add;
+namespace SlayerBirden\DFCodeGeneration\Generator\Config\Parts\Update;
 
 use Nette\PhpGenerator\PhpLiteral;
 use Psr\Log\LoggerInterface;
@@ -27,12 +27,11 @@ final class AbstractFactory implements ConfigPartInterface
      */
     public function getConfig(): array
     {
-        $name = '\\' . $this->getControllerNamespace() . '\Add' . $this->getEntityClassName() . 'Action::class';
-        $hydratorName = $this->dataProvider->provide()['hydrator_name'];
+        $name = '\\' . $this->getControllerNamespace() . '\Update' . $this->getEntityClassName() . 'Action::class';
         return [
             $name => [
                 new PhpLiteral('\SlayerBirden\DataFlowServer\Doctrine\Persistence\EntityManagerRegistry::class'),
-                $hydratorName,
+                $this->dataProvider->provide()['hydrator_name'],
                 $this->dataProvider->provide()['input_filter_name'],
                 LoggerInterface::class,
             ]

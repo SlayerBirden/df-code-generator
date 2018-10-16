@@ -33,9 +33,10 @@ final class Routes implements ConfigPartInterface
             $middleware[] = '\SlayerBirden\DataFlowServer\Domain\Middleware\ValidateOwnerMiddleware::class';
         }
         $middleware[] = $this->getControllerFullName();
+        $regexp = $this->dataProvider->provide()['idRegexp'];
         return [
             [
-                'path' => '/' . $entity . '/{id:\d+}',
+                'path' => sprintf('/%s/{id:\%s}', $entity, $regexp),
                 'middleware' => $middleware,
                 'name' => 'delete_' . $entity,
                 'allowed_methods' => ['DELETE'],

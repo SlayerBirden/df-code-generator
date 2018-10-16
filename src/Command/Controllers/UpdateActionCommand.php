@@ -5,17 +5,21 @@ namespace SlayerBirden\DFCodeGeneration\Command\Controllers;
 
 use SlayerBirden\DFCodeGeneration\Command\AbstractApiCommand;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Code\Parts\DefaultCodeFeederPart;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Code\Parts\InputFilterCodeFeederPart;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Code\Parts\SpecCodeFeederPart;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Code\SplitArrayCodeFeeder;
 use SlayerBirden\DFCodeGeneration\Generator\Config\ConfigGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Parts;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\EntitiesSrcDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\EntityIdDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\HydratorDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\InputFilterDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\NameSpaceDecorator as ConfigNsDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\OwnerDecorator;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\GetGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\NameSpaceDecorator as ControllerNSDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\RelationsProviderDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\UniqueProviderDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\UpdateGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\BaseProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\CachedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DecoratedProvider;
@@ -26,14 +30,14 @@ use SlayerBirden\DFCodeGeneration\Generator\Factory\ResourceMiddlewareFactoryGen
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class GetActionCommand extends AbstractApiCommand
+final class UpdateActionCommand extends AbstractApiCommand
 {
     protected function configure()
     {
         parent::configure();
-        $this->setName('action:get')
-            ->setDescription('Get action controller and support configuration.')
-            ->setHelp('This command creates the Get Action for given entity.');
+        $this->setName('action:update')
+            ->setDescription('Update action controller and support configuration.')
+            ->setHelp('This command creates the Update Action for given entity.');
     }
 
     /**
@@ -49,10 +53,12 @@ final class GetActionCommand extends AbstractApiCommand
         $baseProvider = new BaseProvider($this->entityClassName);
         $controllerNsDecorator = new ControllerNSDecorator($this->entityClassName);
 
-        $controllerGenerator = new GetGenerator(
+        $controllerGenerator = new UpdateGenerator(
             new CachedProvider(
                 new DecoratedProvider(
                     $baseProvider,
+                    new UniqueProviderDecorator($this->entityClassName),
+                    new RelationsProviderDecorator($this->entityClassName),
                     $controllerNsDecorator
                 )
             )
@@ -63,8 +69,9 @@ final class GetActionCommand extends AbstractApiCommand
             new DecoratedProvider(
                 $baseProvider,
                 new EntitiesSrcDecorator($this->entityClassName),
+                new InputFilterDecorator($this->entityClassName),
                 new ConfigNsDecorator($this->entityClassName),
-                $controllerNsDecorator,
+                new ControllerNSDecorator($this->entityClassName),
                 new HydratorDecorator($this->entityClassName),
                 new FactoryNSDecorator($this->entityClassName),
                 new FactoryHydratorDecorator($this->entityClassName),
@@ -75,12 +82,18 @@ final class GetActionCommand extends AbstractApiCommand
         $configGenerator = new ConfigGenerator(
             $configDataProvider,
             new SplitArrayCodeFeeder(
+                new InputFilterCodeFeederPart(
+                    new SpecCodeFeederPart()
+                ),
                 new DefaultCodeFeederPart()
             ),
             new Parts\Doctrine($configDataProvider),
-            new Parts\Get\AbstractFactory($configDataProvider),
-            new Parts\Get\Dependencies($configDataProvider),
-            new Parts\Get\Routes($configDataProvider)
+            new Parts\Update\AbstractFactory($configDataProvider),
+            new Parts\Update\Dependencies($configDataProvider),
+            new Parts\Add\InputFilter(
+                new Parts\Add\InputFilter\Entity($configDataProvider)
+            ),
+            new Parts\Update\Routes($configDataProvider)
         );
         $this->writer->write($configGenerator->generate(), $configGenerator->getFileName());
 
