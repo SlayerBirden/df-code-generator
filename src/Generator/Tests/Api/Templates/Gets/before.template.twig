@@ -1,0 +1,15 @@
+{% if has_owner %}
+$user = $I->grabEntityFromRepository(User::class, ['id' => 1]);
+{% endif %}
+{% for validEntityArray in entities %}
+$I->haveInRepository({{ entityClassName }}::class, [
+{% for key, entity in validEntityArray %}
+{% if not has_owner or key is not same as('owner') %}
+    '{{ key }}' => '{{ entity }}',
+{% endif %}
+{% endfor %}
+{% if has_owner %}
+    'owner' => $user,
+{% endif %}
+]);
+{% endfor %}

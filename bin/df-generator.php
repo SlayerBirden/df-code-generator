@@ -8,6 +8,8 @@ use SlayerBirden\DFCodeGeneration\Command\Controllers\GetsActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Controllers\UpdateActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\AddTestCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\DeleteTestCommand;
+use SlayerBirden\DFCodeGeneration\Command\Tests\Api\GetsTestCommand;
+use SlayerBirden\DFCodeGeneration\Command\Tests\Api\GetTestCommand;
 use SlayerBirden\DFCodeGeneration\Writer\FileWriter;
 use Symfony\Component\Console\Application;
 
@@ -38,9 +40,11 @@ $app->add(new DeleteTestCommand(null, $writer));
 
 // get
 $app->add(new GetActionCommand(null, $writer));
+$app->add(new GetTestCommand(null, $writer));
 
 //gets
 $app->add(new GetsActionCommand(null, $writer));
+$app->add(new GetsTestCommand(null, $writer));
 
 //update
 $app->add(new UpdateActionCommand(null, $writer));

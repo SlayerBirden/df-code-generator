@@ -11,6 +11,7 @@ use SlayerBirden\DFCodeGeneration\Generator\DataProvider\CachedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DecoratedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\AddGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\Providers\Decorators\EntityDataDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\ReflectionEntitySpecProvider;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -41,7 +42,10 @@ final class AddTestCommand extends AbstractApiCommand
                 new DecoratedProvider(
                     $baseProvider,
                     new UniqueProviderDecorator($this->entityClassName),
-                    new EntityDataDecorator($this->entityClassName),
+                    new EntityDataDecorator(
+                        $this->entityClassName,
+                        new ReflectionEntitySpecProvider($this->entityClassName)
+                    ),
                     new EntityIdDecorator($this->entityClassName)
                 )
             )

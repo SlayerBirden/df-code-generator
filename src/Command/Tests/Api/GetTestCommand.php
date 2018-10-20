@@ -10,20 +10,20 @@ use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\Rel
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\BaseProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\CachedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DecoratedProvider;
-use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\DeleteGenerator;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\GetGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\Providers\Decorators\EntityDataDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\ReflectionEntitySpecProvider;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class DeleteTestCommand extends AbstractApiCommand
+final class GetTestCommand extends AbstractApiCommand
 {
     protected function configure()
     {
         parent::configure();
-        $this->setName('test:api:delete')
-            ->setDescription('Api Test for delete action.')
-            ->setHelp('This command creates the Codeception Api Test for Delete Action for given entity.');
+        $this->setName('test:api:get')
+            ->setDescription('Api Test for get action.')
+            ->setHelp('This command creates the Codeception Api Test for Get Action for given entity.');
     }
 
     /**
@@ -38,7 +38,7 @@ final class DeleteTestCommand extends AbstractApiCommand
     {
         $baseProvider = new BaseProvider($this->entityClassName);
 
-        $generator = new DeleteGenerator(
+        $generator = new GetGenerator(
             new CachedProvider(
                 new DecoratedProvider(
                     $baseProvider,

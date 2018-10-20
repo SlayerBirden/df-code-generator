@@ -1,0 +1,19 @@
+$I->wantTo('get {{ pluralRefName }} sorted by {{ sortName }}:{{ sortDir }}');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendGET('/{{ pluralRefName }}?s[{{ sortName }}]={{ sortDir }}');
+$I->seeResponseCodeIs(HttpCode::OK);
+$I->seeResponseContainsJson([
+    'success' => true,
+    'data' => [
+        'count' => {{ entitiesCount }},
+        '{{ pluralRefName }}' => [
+{% for sortedEntity in sorted %}
+            [
+{% for key, value in sortedEntity %}
+                '{{ key }}' => '{{ value }}',
+{% endfor %}
+            ],
+{% endfor %}
+        ],
+    ]
+]);

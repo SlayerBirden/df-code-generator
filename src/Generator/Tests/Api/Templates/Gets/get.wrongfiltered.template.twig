@@ -1,0 +1,10 @@
+$I->wantTo('get {{ pluralRefName }} filtered by wrong filter {{ filterName }}:{{ filterValue }}');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendGET('/{{ pluralRefName }}?f[{{ wrongFilterName }}]={{ wrongFilterValue }}');
+$I->seeResponseCodeIs(HttpCode::BAD_REQUEST);
+$I->seeResponseContainsJson([
+    'success' => false,
+    'data' => [
+        'count' => 0,
+    ]
+]);

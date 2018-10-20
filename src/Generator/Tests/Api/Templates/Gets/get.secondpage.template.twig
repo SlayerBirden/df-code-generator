@@ -1,0 +1,10 @@
+$I->wantTo('get all {{ pluralRefName }}');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendGET('/{{ pluralRefName }}?p=2');
+$I->seeResponseCodeIs(HttpCode::OK);
+$I->seeResponseContainsJson([
+    'success' => true,
+    'data' => [
+        'count' => {{ entitiesCount }},
+    ]
+]);

@@ -42,6 +42,7 @@ final class EntityIdDecorator implements DataProviderDecoratorInterface
                 $data['idType'] = $columnAnnotation->type;
                 $data['idRegexp'] = $this->getRegexpBasedOnType($data['idType']);
                 $data['idGetter'] = 'get' . (new UnderscoreToCamelCase())->filter($data['idName']);
+                $data['invalidId'] = $this->getInvalidIdBasedOnType($data['idType']);
             }
         }
 
@@ -55,6 +56,17 @@ final class EntityIdDecorator implements DataProviderDecoratorInterface
                 return '\w+';
             default: // int
                 return '\d+';
+        }
+    }
+
+    private function getInvalidIdBasedOnType(string $type)
+    {
+        $faker = \Faker\Factory::create();
+        switch ($type) {
+            case 'string':
+                return $faker->numberBetween(0, 100);
+            default: // int
+                return $faker->word;
         }
     }
 }

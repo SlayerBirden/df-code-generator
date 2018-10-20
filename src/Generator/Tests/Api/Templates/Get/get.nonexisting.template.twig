@@ -1,0 +1,10 @@
+$I->wantTo('get non-existing {{ refName }}');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendGET('/{{ refName }}/0');
+$I->seeResponseCodeIs(HttpCode::NOT_FOUND);
+$I->seeResponseContainsJson([
+    'success' => false,
+    'data' => [
+        '{{ refName }}' => null
+    ]
+]);

@@ -1,0 +1,4 @@
+$I->wantTo('get {{ refName }} using invalid id');
+$I->haveHttpHeader('Content-Type', 'application/json');
+$I->sendGET('/{{ refName }}/{{ invalidId }}');
+$I->seeResponseCodeIs(HttpCode::NOT_FOUND);
