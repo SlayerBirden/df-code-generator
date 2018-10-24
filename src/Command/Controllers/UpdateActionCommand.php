@@ -24,6 +24,7 @@ use SlayerBirden\DFCodeGeneration\Generator\DataProvider\BaseProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\CachedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DecoratedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\HydratorFactoryGenerator;
+use SlayerBirden\DFCodeGeneration\Generator\Factory\InputFilterMiddlewareFactoryGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators\HydratorDecorator as FactoryHydratorDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\Providers\Decorators\NameSpaceDecorator as FactoryNSDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Factory\ResourceMiddlewareFactoryGenerator;
@@ -121,6 +122,17 @@ final class UpdateActionCommand extends AbstractApiCommand
             $resourceMiddlewareFactoryGenerator->generate(),
             $resourceMiddlewareFactoryGenerator->getFileName()
         );
+
+        $inputFilterFactoryGenerator = new InputFilterMiddlewareFactoryGenerator(
+            new CachedProvider(
+                new DecoratedProvider(
+                    $baseProvider,
+                    new InputFilterDecorator($this->entityClassName),
+                    new FactoryNSDecorator($this->entityClassName)
+                )
+            )
+        );
+        $this->writer->write($inputFilterFactoryGenerator->generate(), $inputFilterFactoryGenerator->getFileName());
 
         parent::execute($input, $output);
     }

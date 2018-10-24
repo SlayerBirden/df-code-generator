@@ -29,6 +29,7 @@ final class InputFilterDecorator implements DataProviderDecoratorInterface
     {
         $data['input_filter_spec'] = $this->getInputFilterSpec();
         $data['input_filter_name'] = $this->getInputFilterName();
+        $data['input_filter_middleware_name'] = $data['input_filter_name'] . 'Middleware';
 
         return $data;
     }

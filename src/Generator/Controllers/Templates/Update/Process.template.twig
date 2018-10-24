@@ -1,10 +1,5 @@
 $data = Parser::getRequestBody($request);
 $entity = $request->getAttribute(ResourceMiddlewareInterface::DATA_RESOURCE);
-$this->inputFilter->setData($data);
-
-if (!$this->inputFilter->isValid()) {
-    return (new ValidationResponseFactory())('{{ refName }}', $this->inputFilter);
-}
 try {
     $this->hydrator->hydrate($data, $entity);
     $em = $this->managerRegistry->getManagerForClass(DbConfiguration::class);
@@ -12,7 +7,7 @@ try {
     $em->flush();
     $msg = '{{ entityClassName }} has been updated!';
     return (new GeneralSuccessResponseFactory())($msg, '{{ refName }}', $this->hydrator->extract($entity));
-} catch (ORMInvalidArgumentException $exception) {
+} catch (ORMInvalidArgumentException | ValidationException $exception) {
     return (new GeneralErrorResponseFactory())($exception->getMessage(), '{{ refName }}', 400);
 {% if hasUnique %}
 } catch (UniqueConstraintViolationException $exception) {

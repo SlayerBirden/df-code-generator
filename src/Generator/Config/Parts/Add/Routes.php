@@ -28,6 +28,7 @@ final class Routes implements ConfigPartInterface
         $middleware = [
             '\SlayerBirden\DataFlowServer\Authentication\Middleware\TokenMiddleware::class',
             \Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class,
+            $this->dataProvider->provide()['input_filter_middleware_name'],
         ];
         if ($this->dataProvider->provide()['has_owner']) {
             $middleware[] = '\SlayerBirden\DataFlowServer\Domain\Middleware\SetOwnerMiddleware::class';

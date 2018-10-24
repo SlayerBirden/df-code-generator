@@ -36,6 +36,7 @@ final class Routes implements ConfigPartInterface
             );
         }
         $middleware[] = \Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware::class;
+        $middleware[] = $this->dataProvider->provide()['input_filter_middleware_name'];
         if ($this->dataProvider->provide()['has_owner']) {
             $middleware[] = new PhpLiteral('\SlayerBirden\DataFlowServer\Domain\Middleware\SetOwnerMiddleware::class');
         }

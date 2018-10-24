@@ -41,6 +41,7 @@ final class ReflectionInputFilter
                 continue;
             }
             $inputFilter[$property->getName()] = [
+                'required' => false,
                 'filters' => [
                     [
                         'name' => 'stringtrim',
@@ -48,6 +49,7 @@ final class ReflectionInputFilter
                 ],
             ];
             if (!$annotation->nullable) {
+                $inputFilter[$property->getName()]['continue_if_empty'] = true;
                 $inputFilter[$property->getName()]['validators'] = [
                     [
                         'name' => 'notempty',

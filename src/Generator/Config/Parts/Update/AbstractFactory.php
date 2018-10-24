@@ -32,7 +32,6 @@ final class AbstractFactory implements ConfigPartInterface
             $name => [
                 new PhpLiteral('\SlayerBirden\DataFlowServer\Doctrine\Persistence\EntityManagerRegistry::class'),
                 $this->dataProvider->provide()['hydrator_name'],
-                $this->dataProvider->provide()['input_filter_name'],
                 LoggerInterface::class,
             ]
         ];

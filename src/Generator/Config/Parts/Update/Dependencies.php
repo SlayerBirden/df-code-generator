@@ -34,6 +34,9 @@ final class Dependencies implements ConfigPartInterface
         $resourceFactoryName = $this->dataProvider->provide()['factory_namespace'] . '\\' .
             $this->dataProvider->provide()['entityClassName'] .
             'ResourceMiddlewareFactory::class';
+        $inputFilterMiddlewareKey = $this->dataProvider->provide()['input_filter_middleware_name'];
+        $inputFilterMiddleware = $this->dataProvider->provide()['factory_namespace'] .
+            '\\InputFilterMiddlewareFactory::class';
 
         return [
             'factories' => [
@@ -42,6 +45,7 @@ final class Dependencies implements ConfigPartInterface
                     '\SlayerBirden\DataFlowServer\Zend\InputFilter\ProxyFilterManagerFactory::class'
                 ),
                 $resourceName => new PhpLiteral($resourceFactoryName),
+                $inputFilterMiddlewareKey => new PhpLiteral($inputFilterMiddleware),
             ],
         ];
     }

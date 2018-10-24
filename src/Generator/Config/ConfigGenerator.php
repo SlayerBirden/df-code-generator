@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace SlayerBirden\DFCodeGeneration\Generator\Config;
 
-use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpLiteral;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
-use SlayerBirden\DFCodeGeneration\Code\Printer\NsArrayPrinter;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Code\CodeFeederInterface;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderInterface;
 use SlayerBirden\DFCodeGeneration\Generator\GeneratorInterface;
