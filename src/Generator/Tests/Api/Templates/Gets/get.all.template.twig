@@ -3,7 +3,6 @@ $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendGET('/{{ pluralRefName }}?l=100');
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
-    'success' => true,
     'data' => [
         'count' => {{ entitiesCount }},
     ]

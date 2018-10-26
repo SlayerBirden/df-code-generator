@@ -6,14 +6,14 @@ try {
     $em->persist($entity);
     $em->flush();
     $msg = '{{ entityClassName }} has been updated!';
-    return (new GeneralSuccessResponseFactory())($msg, '{{ refName }}', $this->hydrator->extract($entity));
+    return (new ResponseFactory())($msg, 200, '{{ refName }}', $this->hydrator->extract($entity));
 } catch (ORMInvalidArgumentException | ValidationException $exception) {
-    return (new GeneralErrorResponseFactory())($exception->getMessage(), '{{ refName }}', 400);
+    return (new ResponseFactory())($exception->getMessage(), 400, '{{ refName }}');
 {% if hasUnique %}
 } catch (UniqueConstraintViolationException $exception) {
-    return (new GeneralErrorResponseFactory())('{{ uniqueIdxMessage }}', '{{ refName }}', 400);
+    return (new ResponseFactory())('{{ uniqueIdxMessage }}', 400, '{{ refName }}');
 {% endif %}
 } catch (ORMException $exception) {
     $this->logger->error((string)$exception);
-    return (new GeneralErrorResponseFactory())('Error while updating {{ refName }}.', '{{ refName }}', 400);
+    return (new ResponseFactory())('Error while updating {{ refName }}.', 400, '{{ refName }}');
 }

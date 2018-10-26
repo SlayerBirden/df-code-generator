@@ -1,7 +1,7 @@
-$I->wantTo('successfully create {{ refName }}');
+$I->wantTo('successfully update {{ refName }}');
 $I->haveHttpHeader('Content-Type', 'application/json');
-$I->sendPOST('/{{ refName }}', [
-{% for key, entity in validEntityArray %}
+$I->sendPUT('/{{ refName }}/1', [
+{% for key, entity in updateEntityArray %}
     '{{ key }}' => '{{ entity }}',
 {% endfor %}
 ]);
@@ -9,7 +9,8 @@ $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
     'data' => [
         '{{ refName }}' => [
-{% for key, entity in validEntityArray %}
+            {{ idName }} => 1,
+{% for key, entity in updateEntityArray %}
             '{{ key }}' => '{{ entity }}',
 {% endfor %}
         ],

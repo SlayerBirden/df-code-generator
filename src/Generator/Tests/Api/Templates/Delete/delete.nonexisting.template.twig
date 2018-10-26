@@ -3,7 +3,6 @@ $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendDELETE('/{{ refName }}/0');
 $I->seeResponseCodeIs(HttpCode::NOT_FOUND);
 $I->seeResponseContainsJson([
-    'success' => false,
     'data' => [
         '{{ refName }}' => null
     ]

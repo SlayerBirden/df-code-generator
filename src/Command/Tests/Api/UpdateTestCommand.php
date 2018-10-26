@@ -6,26 +6,24 @@ namespace SlayerBirden\DFCodeGeneration\Command\Tests\Api;
 use SlayerBirden\DFCodeGeneration\Command\AbstractApiCommand;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\EntityIdDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\OwnerDecorator;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\EntityNamePluralDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\RelationsProviderDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\BaseProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\CachedProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DecoratedProvider;
-use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\GetsGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\Providers\Decorators\EntityDataDecorator;
-use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\Providers\Decorators\PluralDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\ReflectionEntitySpecProvider;
+use SlayerBirden\DFCodeGeneration\Generator\Tests\Api\UpdateGenerator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class GetsTestCommand extends AbstractApiCommand
+final class UpdateTestCommand extends AbstractApiCommand
 {
     protected function configure()
     {
         parent::configure();
-        $this->setName('test:api:gets')
-            ->setDescription('Api Test for get multiple action.')
-            ->setHelp('This command creates the Codeception Api Test for Get Multiple Action for given entity.');
+        $this->setName('test:api:update')
+            ->setDescription('Api Test for update action.')
+            ->setHelp('This command creates the Codeception Api Test for Update Action for given entity.');
     }
 
     /**
@@ -40,7 +38,7 @@ final class GetsTestCommand extends AbstractApiCommand
     {
         $baseProvider = new BaseProvider($this->entityClassName);
 
-        $generator = new GetsGenerator(
+        $generator = new UpdateGenerator(
             new CachedProvider(
                 new DecoratedProvider(
                     $baseProvider,
@@ -48,13 +46,9 @@ final class GetsTestCommand extends AbstractApiCommand
                         $this->entityClassName,
                         new ReflectionEntitySpecProvider($this->entityClassName)
                     ),
-                    new PluralDecorator(
-                        $this->entityClassName,
-                        new ReflectionEntitySpecProvider($this->entityClassName)
-                    ),
+                    new EntityIdDecorator($this->entityClassName),
                     new RelationsProviderDecorator($this->entityClassName),
-                    new OwnerDecorator($this->entityClassName),
-                    new EntityNamePluralDecorator()
+                    new OwnerDecorator($this->entityClassName)
                 )
             )
         );

@@ -40,6 +40,11 @@ final class EntityDataDecorator implements DataProviderDecoratorInterface
         $data['validEntityArray'] = $this->getAllColumns();
         $data['incompleteEntityArray'] = $this->getIncompleteColumns();
         $data['invalidEntityArray'] = $this->getWrongDataColumns();
+        $data['updateEntityArray'] = $this->getAllColumns();
+        $data['mergedUpdatedEntityArray'] = array_replace_recursive(
+            $data['validEntityArray'],
+            $data['incompleteEntityArray']
+        );
 
         return $data;
     }

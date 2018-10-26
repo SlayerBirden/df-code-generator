@@ -10,6 +10,7 @@ use SlayerBirden\DFCodeGeneration\Command\Tests\Api\AddTestCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\DeleteTestCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\GetsTestCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\GetTestCommand;
+use SlayerBirden\DFCodeGeneration\Command\Tests\Api\UpdateTestCommand;
 use SlayerBirden\DFCodeGeneration\Writer\FileWriter;
 use Symfony\Component\Console\Application;
 
@@ -48,4 +49,5 @@ $app->add(new GetsTestCommand(null, $writer));
 
 //update
 $app->add(new UpdateActionCommand(null, $writer));
+$app->add(new UpdateTestCommand(null, $writer));
 $app->run();

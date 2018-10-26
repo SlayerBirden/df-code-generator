@@ -18,6 +18,3 @@ $I->wantTo('delete someone elses {{ refName }}');
 $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendDELETE('/{{ refName }}/2');
 $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
-$I->seeResponseContainsJson([
-    'success' => false,
-]);

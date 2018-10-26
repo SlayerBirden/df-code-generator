@@ -14,7 +14,7 @@ use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\Hydrator
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\NameSpaceDecorator as ConfigNsDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Providers\Decorators\OwnerDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\GetGenerator;
-use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\NameSpaceDecorator as ControllerNSDecorator;
+use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\NameSpaceDecorator as ControlNSDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\Controllers\Providers\Decorators\RelationsProviderDecorator;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\BaseProvider;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\CachedProvider;
@@ -38,8 +38,6 @@ final class GetActionCommand extends AbstractApiCommand
 
     /**
      * {@inheritdoc}
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @throws \Twig_Error_Loader
      * @throws \Twig_Error_Runtime
      * @throws \Twig_Error_Syntax
@@ -47,7 +45,7 @@ final class GetActionCommand extends AbstractApiCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $baseProvider = new BaseProvider($this->entityClassName);
-        $controllerNsDecorator = new ControllerNSDecorator($this->entityClassName);
+        $controllerNsDecorator = new ControlNSDecorator($this->entityClassName);
 
         $controllerGenerator = new GetGenerator(
             new CachedProvider(

@@ -2,5 +2,5 @@ $entity = $request->getAttribute(ResourceMiddlewareInterface::DATA_RESOURCE);
 $em = $this->managerRegistry->getManagerForClass({{ entityClassName }}::class);
 $em->remove($user);
 $em->flush();
-return (new GeneralSuccessResponseFactory())('{{ entityClassName }} deleted successfully', '{{ refName }}',
+return (new ResponseFactory())('{{ entityClassName }} deleted successfully', 200, '{{ refName }}',
    $this->hydrator->extract($entity));

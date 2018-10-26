@@ -111,7 +111,7 @@ BODY
         $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Middleware\ResourceMiddlewareInterface');
         $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Persistence\EntityManagerRegistry');
         $namespace->addUse($this->dataProvider->provide()['entityName']);
-        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\Validation\GeneralSuccessResponseFactory');
+        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\ResponseFactory');
         $namespace->addUse('Zend\Hydrator\HydratorInterface');
     }
 

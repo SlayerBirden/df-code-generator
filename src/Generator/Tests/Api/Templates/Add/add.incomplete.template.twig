@@ -6,6 +6,3 @@ $I->sendPOST('/{{ refName }}', [
 {% endfor %}
 ]);
 $I->seeResponseCodeIs(HttpCode::BAD_REQUEST);
-$I->seeResponseContainsJson([
-    'success' => false,
-]);

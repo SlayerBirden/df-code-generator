@@ -115,8 +115,7 @@ BODY
         $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Persistence\EntityManagerRegistry');
         $namespace->addUse($this->getEntityName());
         $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\Request\Parser');
-        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\Validation\GeneralErrorResponseFactory');
-        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\Validation\GeneralSuccessResponseFactory');
+        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\ResponseFactory');
         $namespace->addUse('SlayerBirden\DataFlowServer\Validation\Exception\ValidationException');
         $namespace->addUse('Zend\Hydrator\HydratorInterface');
     }

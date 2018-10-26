@@ -113,8 +113,7 @@ BODY
         $namespace->addUse(LoggerInterface::class);
         $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Collection\CriteriaBuilder');
         $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Hydrator\ListExtractor');
-        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\Validation\GeneralErrorResponseFactory');
-        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\Validation\GeneralSuccessResponseFactory');
+        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\ResponseFactory');
         $namespace->addUse('Zend\Hydrator\HydratorInterface');
     }
 

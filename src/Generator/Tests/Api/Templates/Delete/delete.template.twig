@@ -3,7 +3,6 @@ $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendDELETE('/{{ refName }}/1');
 $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
-    'success' => true,
     'data' => [
         '{{ refName }}' => [
 {% for key, entity in validEntityArray %}

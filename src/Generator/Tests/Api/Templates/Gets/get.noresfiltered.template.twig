@@ -3,7 +3,6 @@ $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendGET('/{{ pluralRefName }}?f[{{ filterName }}]={{ notFoundFilterValue }}');
 $I->seeResponseCodeIs(HttpCode::NOT_FOUND);
 $I->seeResponseContainsJson([
-    'success' => false,
     'data' => [
         'count' => 0,
     ]

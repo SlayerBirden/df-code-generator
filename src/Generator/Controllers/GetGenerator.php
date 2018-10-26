@@ -97,7 +97,7 @@ BODY
         $namespace->addUse('Psr\Http\Server\MiddlewareInterface');
         $namespace->addUse('Psr\Http\Server\RequestHandlerInterface');
         $namespace->addUse('SlayerBirden\DataFlowServer\Doctrine\Middleware\ResourceMiddlewareInterface');
-        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\Validation\GeneralSuccessResponseFactory');
+        $namespace->addUse('SlayerBirden\DataFlowServer\Stdlib\ResponseFactory');
         $namespace->addUse('Zend\Hydrator\HydratorInterface');
     }
 
