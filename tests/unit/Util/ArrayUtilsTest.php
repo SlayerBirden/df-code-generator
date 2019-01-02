@@ -126,6 +126,27 @@ final class ArrayUtilsTest extends TestCase
                     5
                 ],
             ],
+            // test 2 lists
+            [
+                [
+                    [
+                        'name' => 'A',
+                    ],
+                ],
+                [
+                    [
+                        'name' => 'B',
+                    ],
+                ],
+                [
+                    [
+                        'name' => 'A',
+                    ],
+                    [
+                        'name' => 'B',
+                    ],
+                ],
+            ],
         ];
     }
 }

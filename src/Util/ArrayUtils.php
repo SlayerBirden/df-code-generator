@@ -35,7 +35,7 @@ final class ArrayUtils
             foreach ($b as $value) {
                 $a[] = $value;
             }
-            $unique = array_unique($a);
+            $unique = array_unique($a, SORT_REGULAR);
             if (self::isSequential($a)) {
                 return array_values($unique);
             }

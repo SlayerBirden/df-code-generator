@@ -15,7 +15,7 @@ final class SpecCodeFeederPart implements ArrayPartInterface
     public function feed(string $key, array $data, ClassType $class, PhpNamespace $namespace): void
     {
         $class->addMethod($this->getMethodName($key))
-            ->setVisibility(ClassType::VISIBILITY_PUBLIC)
+            ->setVisibility(ClassType::VISIBILITY_PRIVATE)
             ->setReturnType('array')
             ->setBody(
                 sprintf('return %s;', (new NsArrayPrinter($namespace))->printArray($data, 1, ''))
