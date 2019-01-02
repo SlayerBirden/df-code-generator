@@ -112,7 +112,7 @@ final class EntityDataDecorator implements DataProviderDecoratorInterface
             }
             switch ($definition['type']) {
                 case 'string':
-                    $columns[$code] = $this->generator->words;
+                    $columns[$code] = $this->generator->text(500);
                     break;
                 case 'datetime':
                     $columns[$code] = $this->generator->word;

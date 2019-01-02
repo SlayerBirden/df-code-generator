@@ -1,4 +1,4 @@
-$I->wantTo('attempt to create incomplete {{ refName }}');
+$I->wantTo('attempt to create invalid {{ refName }}');
 $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendPOST('/{{ refName }}', [
 {% for key, entity in invalidEntityArray %}

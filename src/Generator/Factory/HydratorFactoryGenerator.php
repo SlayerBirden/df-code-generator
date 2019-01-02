@@ -45,7 +45,9 @@ final class HydratorFactoryGenerator implements GeneratorInterface
         $namespace = $file->addNamespace($this->getFactoryNamespace());
         $namespace->addUse(\Interop\Container\ContainerInterface::class);
         if (!empty($this->getSingleDeps())) {
-            $namespace->addUse('\SlayerBirden\DataFlowServer\Doctrine\Hydrator\Strategy\NestedEntityStrategy');
+            $namespace->addUse(
+                '\SlayerBirden\DataFlowServer\Doctrine\Hydrator\Strategy\ExtractionNestedEntityStrategy'
+            );
         }
         if (!empty($this->getMultiDeps())) {
             $namespace->addUse('\SlayerBirden\DataFlowServer\Doctrine\Hydrator\Strategy\CollectionStrategy');
