@@ -5,6 +5,8 @@ namespace SlayerBirden\DFCodeGeneration\Writer;
 
 final class FileWriter implements WriteInterface
 {
+    const CONFIG_FILE_NAME = 'ConfigProvider.php';
+
     /**
      * @var string
      */
@@ -24,7 +26,7 @@ final class FileWriter implements WriteInterface
         if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
         }
-        if (!file_exists($fullName)) {
+        if (!file_exists($fullName) || basename($fullName) === self::CONFIG_FILE_NAME) {
             file_put_contents($fullName, $content);
         }
     }
