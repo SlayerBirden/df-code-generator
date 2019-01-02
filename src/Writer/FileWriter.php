@@ -24,6 +24,8 @@ final class FileWriter implements WriteInterface
         if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
         }
-        file_put_contents($fullName, $content);
+        if (!file_exists($fullName)) {
+            file_put_contents($fullName, $content);
+        }
     }
 }
