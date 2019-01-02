@@ -103,13 +103,12 @@ final class NsArrayPrinter
             return $this->phpNamespace->unresolveName($className) . '::class';
         }
         // then checks for backslash
-        if (is_string($variable) && (strpos($variable, '\\') !== false)) {
-            if (strpos($variable, ':\\') !== false) {
-                // semicolon means this is not a class name
-                return $variable;
-            }
+        // also check that the string does not contain not allowed characters
+        if (is_string($variable)
+            && (strpos($variable, '\\') !== false)
+            && preg_match('/^[\w\\\]+$/', $variable)) {
             return $this->phpNamespace->unresolveName($variable) . '::class';
         }
-        return var_export($variable, true);
+        return stripslashes(var_export($variable, true));
     }
 }

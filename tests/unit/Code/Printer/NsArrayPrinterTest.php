@@ -99,7 +99,7 @@ ARRAY
                 $ns,
                 <<<ARRAY
 [
-    {id:\d+},
+    '{id:\d+}',
 ],
 
 ARRAY
