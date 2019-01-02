@@ -92,7 +92,7 @@ BODY
                             ->setTypeHint('Psr\Http\Server\RequestHandlerInterface'),
                     ])
                     ->setReturnType('Psr\Http\Message\ResponseInterface')
-                    ->setComment("@inheritdoc\n")
+                    ->setComment("@inheritdoc\n@throws ORMException\n")
                     ->setBody($this->getProcessMethodBody())
                     ->setVisibility(ClassType::VISIBILITY_PUBLIC),
             ]);

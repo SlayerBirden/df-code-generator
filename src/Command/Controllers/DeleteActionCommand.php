@@ -5,6 +5,8 @@ namespace SlayerBirden\DFCodeGeneration\Command\Controllers;
 
 use SlayerBirden\DFCodeGeneration\Command\AbstractApiCommand;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Code\Parts\DefaultCodeFeederPart;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Code\Parts\InputFilterCodeFeederPart;
+use SlayerBirden\DFCodeGeneration\Generator\Config\Code\Parts\SpecCodeFeederPart;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Code\SplitArrayCodeFeeder;
 use SlayerBirden\DFCodeGeneration\Generator\Config\ConfigGenerator;
 use SlayerBirden\DFCodeGeneration\Generator\Config\Parts;
@@ -73,6 +75,9 @@ final class DeleteActionCommand extends AbstractApiCommand
         $configGenerator = new ConfigGenerator(
             $configDataProvider,
             new SplitArrayCodeFeeder(
+                new InputFilterCodeFeederPart(
+                    new SpecCodeFeederPart()
+                ),
                 new DefaultCodeFeederPart()
             ),
             new Parts\Doctrine($configDataProvider),

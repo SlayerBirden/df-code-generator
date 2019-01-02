@@ -1,6 +1,6 @@
 $entity = $request->getAttribute(ResourceMiddlewareInterface::DATA_RESOURCE);
 $em = $this->managerRegistry->getManagerForClass({{ entityClassName }}::class);
-$em->remove($user);
+$em->remove($entity);
 $em->flush();
 return (new ResponseFactory())('{{ entityClassName }} deleted successfully', 200, '{{ refName }}',
    $this->hydrator->extract($entity));
