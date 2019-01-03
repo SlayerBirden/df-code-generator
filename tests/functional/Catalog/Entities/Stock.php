@@ -20,6 +20,11 @@ class Stock
      * @var float
      **/
     private $qty;
+    /**
+     * @ORM\Column(type="datetime")
+     * @var \DateTime
+     **/
+    private $createdAt;
 
     /**
      * @return int|null
@@ -43,5 +48,21 @@ class Stock
     public function setQty(float $qty): void
     {
         $this->qty = $qty;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     */
+    public function setCreatedAt(\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 }

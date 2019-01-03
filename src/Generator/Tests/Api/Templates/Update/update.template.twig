@@ -9,7 +9,7 @@ $I->seeResponseCodeIs(HttpCode::OK);
 $I->seeResponseContainsJson([
     'data' => [
         '{{ refName }}' => [
-            {{ idName }} => 1,
+            '{{ idName }}' => 1,
 {% for key, entity in updateEntityArray %}
             '{{ key|underscore }}' => '{{ entity }}',
 {% endfor %}

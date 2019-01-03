@@ -90,7 +90,7 @@ final class EntityDataDecorator implements DataProviderDecoratorInterface
     {
         $columns = [];
         foreach ($this->entitySpecProvider->getSpec() as $code => $definition) {
-            if ($definition['is_generated'] || $definition['required']) {
+            if ($definition['is_generated']) {
                 continue;
             } else {
                 $columns[$code] = $this->getDataByType($definition['type']);

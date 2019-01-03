@@ -1,4 +1,4 @@
-$I->wantTo('get all {{ pluralRefName }}');
+$I->wantTo('get second page {{ pluralRefName }}');
 $I->haveHttpHeader('Content-Type', 'application/json');
 $I->sendGET('/{{ pluralRefName }}?p=2');
 $I->seeResponseCodeIs(HttpCode::OK);

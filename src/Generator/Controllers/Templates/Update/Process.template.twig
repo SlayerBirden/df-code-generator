@@ -2,7 +2,7 @@ $data = Parser::getRequestBody($request);
 $entity = $request->getAttribute(ResourceMiddlewareInterface::DATA_RESOURCE);
 try {
     $this->hydrator->hydrate($data, $entity);
-    $em = $this->managerRegistry->getManagerForClass(DbConfiguration::class);
+    $em = $this->managerRegistry->getManagerForClass({{ entityClassName }}::class);
     $em->persist($entity);
     $em->flush();
     $msg = '{{ entityClassName }} has been updated!';
