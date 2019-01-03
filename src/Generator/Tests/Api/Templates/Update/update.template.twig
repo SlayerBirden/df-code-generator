@@ -11,7 +11,7 @@ $I->seeResponseContainsJson([
         '{{ refName }}' => [
             {{ idName }} => 1,
 {% for key, entity in updateEntityArray %}
-            '{{ key }}' => '{{ entity }}',
+            '{{ key|underscore }}' => '{{ entity }}',
 {% endfor %}
         ],
     ],

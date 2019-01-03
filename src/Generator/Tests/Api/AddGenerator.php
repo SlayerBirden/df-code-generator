@@ -9,6 +9,7 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 use SlayerBirden\DFCodeGeneration\Generator\DataProvider\DataProviderInterface;
 use SlayerBirden\DFCodeGeneration\Generator\GeneratorInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -28,6 +29,10 @@ final class AddGenerator implements GeneratorInterface
         $this->dataProvider = $dataProvider;
         $loader = new FilesystemLoader(__DIR__ . '/Templates');
         $this->twig = new Environment($loader);
+        $filter = new \Twig\TwigFilter('underscore', function ($string) {
+            return (new CamelCaseToSnakeCaseNameConverter())->normalize($string);
+        });
+        $this->twig->addFilter($filter);
     }
 
     /**

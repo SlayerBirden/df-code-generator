@@ -9,7 +9,7 @@ $I->seeResponseContainsJson([
 {% for sortedEntity in sorted %}
             [
 {% for key, value in sortedEntity %}
-                '{{ key }}' => '{{ value }}',
+                '{{ key|underscore }}' => '{{ value }}',
 {% endfor %}
             ],
 {% endfor %}

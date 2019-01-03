@@ -10,7 +10,7 @@ $I->seeResponseContainsJson([
     'data' => [
         '{{ refName }}' => [
 {% for key, entity in validEntityArray %}
-            '{{ key }}' => '{{ entity }}',
+            '{{ key|underscore }}' => '{{ entity }}',
 {% endfor %}
         ],
     ],

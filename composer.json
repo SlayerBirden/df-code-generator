@@ -24,7 +24,8 @@
         "doctrine/annotations": "^1.5",
         "doctrine/orm": "^2.6",
         "fzaninotto/faker": "^1.8",
-        "nette/php-generator": "^3.2"
+        "nette/php-generator": "^3.2",
+        "symfony/serializer": "^4.0"
     },
     "bin": [
         "bin/df-generator"
