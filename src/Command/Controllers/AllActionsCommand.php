@@ -40,6 +40,7 @@ final class AllActionsCommand extends AbstractApiCommand
             );
             $greetInput = new ArrayInput($arguments);
             $command->run($greetInput, $output);
+            sleep(1); // IO operations
         }
     }
 }
