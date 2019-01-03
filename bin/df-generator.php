@@ -2,11 +2,13 @@
 declare(strict_types=1);
 
 use SlayerBirden\DFCodeGeneration\Command\Controllers\AddActionCommand;
+use SlayerBirden\DFCodeGeneration\Command\Controllers\AllActionsCommand;
 use SlayerBirden\DFCodeGeneration\Command\Controllers\DeleteActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Controllers\GetActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Controllers\GetsActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Controllers\UpdateActionCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\AddTestCommand;
+use SlayerBirden\DFCodeGeneration\Command\Tests\Api\AllTestsCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\DeleteTestCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\GetsTestCommand;
 use SlayerBirden\DFCodeGeneration\Command\Tests\Api\GetTestCommand;
@@ -50,4 +52,8 @@ $app->add(new GetsTestCommand(null, $writer));
 //update
 $app->add(new UpdateActionCommand(null, $writer));
 $app->add(new UpdateTestCommand(null, $writer));
+
+//all
+$app->add(new AllActionsCommand(null, $writer));
+$app->add(new AllTestsCommand(null, $writer));
 $app->run();
