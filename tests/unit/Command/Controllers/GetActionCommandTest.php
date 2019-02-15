@@ -5,6 +5,7 @@ namespace SlayerBirden\DFCodeGeneration\Command\Controllers;
 
 use PHPUnit\Framework\TestCase;
 use SlayerBirden\DFCodeGeneration\Command\Hubby;
+use SlayerBirden\DFCodeGeneration\Generator\Config\FileConfigProvider;
 use SlayerBirden\DFCodeGeneration\Writer\WriteInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -13,7 +14,7 @@ final class GetActionCommandTest extends TestCase
     public function testExecuteDryRun()
     {
         $writer = $this->prophesize(WriteInterface::class);
-        $tester = new CommandTester(new GetActionCommand(null, $writer->reveal()));
+        $tester = new CommandTester(new GetActionCommand(null, $writer->reveal(), new FileConfigProvider()));
         $tester->execute([
             'entity' => Hubby::class,
         ]);
@@ -39,7 +40,7 @@ final class GetActionCommandTest extends TestCase
                 $this->content .= $content;
             }
         };
-        $tester = new CommandTester(new GetActionCommand(null, $writer));
+        $tester = new CommandTester(new GetActionCommand(null, $writer, new FileConfigProvider()));
         $tester->execute([
             'entity' => Hubby::class,
             '--force' => true,

@@ -31,29 +31,31 @@ foreach ($autoloadPaths as $path) {
     }
 }
 
+$configProvider = new \SlayerBirden\DFCodeGeneration\Generator\Config\FileConfigProvider();
+
 $app = new Application();
 
 $writer = new FileWriter($baseDir);
 // add
-$app->add(new AddActionCommand(null, $writer));
+$app->add(new AddActionCommand(null, $writer, $configProvider));
 $app->add(new AddTestCommand(null, $writer));
 // delete
-$app->add(new DeleteActionCommand(null, $writer));
+$app->add(new DeleteActionCommand(null, $writer, $configProvider));
 $app->add(new DeleteTestCommand(null, $writer));
 
 // get
-$app->add(new GetActionCommand(null, $writer));
+$app->add(new GetActionCommand(null, $writer, $configProvider));
 $app->add(new GetTestCommand(null, $writer));
 
 //gets
-$app->add(new GetsActionCommand(null, $writer));
+$app->add(new GetsActionCommand(null, $writer, $configProvider));
 $app->add(new GetsTestCommand(null, $writer));
 
 //update
-$app->add(new UpdateActionCommand(null, $writer));
+$app->add(new UpdateActionCommand(null, $writer, $configProvider));
 $app->add(new UpdateTestCommand(null, $writer));
 
 //all
-$app->add(new AllActionsCommand(null, $writer));
+$app->add(new AllActionsCommand(null, $writer, $configProvider));
 $app->add(new AllTestsCommand(null, $writer));
 $app->run();

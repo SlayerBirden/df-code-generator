@@ -80,6 +80,7 @@ final class DeleteActionCommand extends AbstractApiCommand
                 ),
                 new DefaultCodeFeederPart()
             ),
+            $this->getConfigProvider(),
             new Parts\Doctrine($configDataProvider),
             new Parts\Delete\AbstractFactory($configDataProvider),
             new Parts\Delete\Dependencies($configDataProvider),

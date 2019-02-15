@@ -86,6 +86,7 @@ final class UpdateActionCommand extends AbstractApiCommand
                 ),
                 new DefaultCodeFeederPart()
             ),
+            $this->getConfigProvider(),
             new Parts\Doctrine($configDataProvider),
             new Parts\Update\AbstractFactory($configDataProvider),
             new Parts\Update\Dependencies($configDataProvider),

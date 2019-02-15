@@ -81,6 +81,7 @@ final class GetsActionCommand extends AbstractApiCommand
                 ),
                 new DefaultCodeFeederPart()
             ),
+            $this->getConfigProvider(),
             new Parts\Doctrine($configDataProvider),
             new Parts\Gets\AbstractFactory($configDataProvider),
             new Parts\Gets\Dependencies($configDataProvider),

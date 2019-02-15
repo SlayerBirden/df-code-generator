@@ -23,22 +23,24 @@ final class ConfigGenerator implements GeneratorInterface
      */
     private $parts;
     /**
-     * @var array
-     */
-    private $currentConfig;
-    /**
      * @var CodeFeederInterface
      */
     private $codeFeeder;
+    /**
+     * @var CurrentConfigProviderInterface
+     */
+    private $currentConfigProvider;
 
     public function __construct(
         DataProviderInterface $dataProvider,
         CodeFeederInterface $codeFeeder,
+        CurrentConfigProviderInterface $currentConfigProvider,
         ConfigPartInterface ...$parts
     ) {
         $this->dataProvider = $dataProvider;
         $this->parts = $parts;
         $this->codeFeeder = $codeFeeder;
+        $this->currentConfigProvider = $currentConfigProvider;
     }
 
     public function generate(): string
@@ -56,7 +58,8 @@ final class ConfigGenerator implements GeneratorInterface
             $invoke[$configPart->getCode()] = $configPart->getConfig();
         }
 
-        $invoke = ArrayUtils::merge($this->getCurrentConfig(), $invoke);
+        $invoke = ArrayUtils::merge($this->currentConfigProvider->getCurrentConfig($this->getClassName()), $invoke);
+        $this->currentConfigProvider->setCurrentConfig($this->getClassName(), $invoke);
         $this->addUses($invoke, $namespace);
         $this->codeFeeder->feed($invoke, $class, $namespace);
 
@@ -71,21 +74,6 @@ final class ConfigGenerator implements GeneratorInterface
     private function getConfigNamespace(): string
     {
         return $this->dataProvider->provide()['config_namespace'];
-    }
-
-    private function getCurrentConfig(): array
-    {
-        if ($this->currentConfig === null) {
-            $config = $this->getClassName();
-
-            if (class_exists($config)) {
-                $this->currentConfig = (new $config())();
-            } else {
-                $this->currentConfig = [];
-            }
-        }
-
-        return $this->currentConfig;
     }
 
     private function addUses(array $config, PhpNamespace $phpNamespace): void

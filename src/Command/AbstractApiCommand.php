@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SlayerBirden\DFCodeGeneration\Command;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use SlayerBirden\DFCodeGeneration\Generator\Config\CurrentConfigProviderInterface;
 use SlayerBirden\DFCodeGeneration\Writer\OutputWriter;
 use SlayerBirden\DFCodeGeneration\Writer\WriteInterface;
 use Symfony\Component\Console\Command\Command;
@@ -32,11 +33,16 @@ abstract class AbstractApiCommand extends Command
      * @var null|WriteInterface
      */
     protected $writer;
+    /**
+     * @var null|CurrentConfigProviderInterface
+     */
+    private $configProvider;
 
-    public function __construct(?string $name = null, ?WriteInterface $writer = null)
+    public function __construct(?string $name = null, ?WriteInterface $writer = null, ?CurrentConfigProviderInterface $configProvider = null)
     {
         parent::__construct($name);
         $this->writer = $writer;
+        $this->configProvider = $configProvider;
     }
 
     protected function configure()
@@ -84,5 +90,21 @@ abstract class AbstractApiCommand extends Command
             throw new LogicException('Writer is not defined!');
         }
         return $this->writer;
+    }
+
+    /**
+     * @return CurrentConfigProviderInterface|null
+     */
+    public function getConfigProvider(): ?CurrentConfigProviderInterface
+    {
+        return $this->configProvider;
+    }
+
+    /**
+     * @param CurrentConfigProviderInterface $configProvider
+     */
+    public function setConfigProvider(CurrentConfigProviderInterface $configProvider): void
+    {
+        $this->configProvider = $configProvider;
     }
 }

@@ -32,15 +32,17 @@ final class AllActionsCommand extends AbstractApiCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         foreach ($this->commands as $commandName) {
+            /** @var AbstractApiCommand $command */
             $command = $this->getApplication()->find($commandName);
+            $command->setConfigProvider($this->getConfigProvider());
 
             $arguments = array(
+                'command' => $commandName,
                 'entity' => $this->entityClassName,
                 '--force' => $this->force,
             );
             $greetInput = new ArrayInput($arguments);
             $command->run($greetInput, $output);
-            sleep(1); // IO operations
         }
     }
 }

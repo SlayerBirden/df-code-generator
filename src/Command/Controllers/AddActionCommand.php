@@ -83,6 +83,7 @@ final class AddActionCommand extends AbstractApiCommand
                 ),
                 new DefaultCodeFeederPart()
             ),
+            $this->getConfigProvider(),
             new Parts\Doctrine($configDataProvider),
             new Parts\Add\AbstractFactory($configDataProvider),
             new Parts\Add\Dependencies($configDataProvider),
