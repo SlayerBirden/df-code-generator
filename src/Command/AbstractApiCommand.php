@@ -45,7 +45,13 @@ abstract class AbstractApiCommand extends Command
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Without force flag no writes happen (only output).');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    /**
+     * We can't use _initialize_ since it's called before validation
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    private function init(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
         $this->entityClassName = $input->getArgument('entity');
@@ -67,6 +73,7 @@ abstract class AbstractApiCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->init($input, $output);
         $output->writeln([
             '<error>IMPORTANT: please check all generated files before committing.</error>',
             '<error># You might want to run something like "php-cs-fixer" to make sure formatting is correct.</error>',
